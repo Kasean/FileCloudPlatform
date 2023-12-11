@@ -1,2 +1,3 @@
 rootProject.name = "FileGarbage"
+include 'file-garbage-core'
 
