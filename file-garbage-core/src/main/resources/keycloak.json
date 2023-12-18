@@ -1,11 +1,10 @@
 {
-  "realm": "master",
+  "realm": "myrealm",
   "auth-server-url": "http://localhost:8080/auth",
   "ssl-required": "external",
-  "resource": "CoreApplication",
+  "resource": "myclient",
   "credentials": {
-    "secret": "SecretCoreApplication"
+    "secret": "myclientsecret"
   },
-  "confidential-port": 0,
-  "policy-enforcer": {}
+  "confidential-port": 0
 }
