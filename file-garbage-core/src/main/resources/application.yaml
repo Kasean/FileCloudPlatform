@@ -1,19 +1,14 @@
 keycloak:
-  config:
-    resolver: KeycloakSpringBootConfigResolver
-    file: classpath:keycloak.json
-
-spring:
-  security:
-    oauth2:
-      client:
-        registration:
-          keycloak:
-            client-id: CoreApplication
-            client-secret: SecretCoreApplication
-            authorization-grant-type: authorization_code
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-            scope: openid
-        provider:
-          keycloak:
-            issuer-uri: http://localhost:9990/auth/realms/master
+  auth-server-url: http://localhost:8080/auth
+  realm: myrealm
+  resource: myclient
+  credentials:
+    secret: myclientsecret
+  security-constraints:
+    - securityCollections:
+      - name: secured area
+        authRoles:
+        - user
+        patterns:
+        - /secured/*
+  cors: true
