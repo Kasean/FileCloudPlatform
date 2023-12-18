@@ -4,6 +4,5 @@
 
 ### Ports:
 
-core application - 8080
-
-keycloak - 8081
+1. core application - 8080
+2. keycloak - 8081
