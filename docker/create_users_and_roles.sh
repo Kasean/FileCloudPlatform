@@ -14,7 +14,7 @@ curl -s -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $T
 curl -s -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN" -d '{"name":"ADMIN"}' "http://localhost:9990/auth/admin/realms/master/roles"
 
 # Create client
-curl -s -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN" -d '{"clientId":"CoreApplication", "enabled":true, "publicClient":true, "redirectUris":["/*"]}' "http://localhost:9990/auth/admin/realms/master/clients"
+curl -s -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN" -d '{"clientId":"CoreApplication", "secret":"SecretCoreApplication", "enabled":true, "publicClient":false, "redirectUris":["/*"]}' "http://localhost:9990/auth/admin/realms/master/clients"
 
 # Create users
 curl -s -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN" -d '{"username":"SUPERADMIN","enabled":true,"credentials":[{"type":"password","value":"superadminpassword","temporary":false}]}' "http://localhost:9990/auth/admin/realms/master/users"

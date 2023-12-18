@@ -1,6 +1,14 @@
-keycloak:
-  auth-server-url: http://localhost:9990/auth
-  realm: master
-  resource: CoreApplication
-  public-client: true
-  principal-attribute: preferred_username
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: CoreApplication
+            client-secret: SecretCoreApplication
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope: openid
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:9990/auth/realms/master
