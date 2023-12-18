@@ -1,3 +1,8 @@
+keycloak:
+  config:
+    resolver: KeycloakSpringBootConfigResolver
+    file: classpath:keycloak.json
+
 spring:
   security:
     oauth2:
