@@ -2,7 +2,7 @@ FROM jboss/keycloak
 
 USER root
 
-RUN apt-get update && apt-get install -y jq
+RUN dnf update -y && dnf install -y jq
 
 USER jboss
 
