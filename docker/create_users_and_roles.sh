@@ -26,3 +26,5 @@ ADMIN_ID=$(curl -s -X GET -H "Content-Type: application/json" -H "Authorization:
 
 curl -s -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN" -d '[{"id":"","name":"SUPERADMIN"}]' "http://localhost:9990/auth/admin/realms/master/users/$SUPERADMIN_ID/role-mappings/realm"
 curl -s -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN" -d '[{"id":"","name":"ADMIN"}]' "http://localhost:9990/auth/admin/realms/master/users/$ADMIN_ID/role-mappings/realm"
+
+tail -f /dev/null
