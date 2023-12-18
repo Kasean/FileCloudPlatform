@@ -5,4 +5,4 @@
 ### Ports:
 
 1. core application - 8080
-2. keycloak - 8081
+2. keycloak - 9990
