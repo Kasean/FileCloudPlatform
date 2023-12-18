@@ -1,6 +1,15 @@
 version: '3.7'
 
 services:
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_DB=keycloak
+      - POSTGRES_USER=keycloak
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   keycloak:
     build:
       context: .
@@ -17,15 +26,6 @@ services:
       - "9990:8080"
     depends_on:
       - postgres
-
-  postgres:
-    image: postgres
-    environment:
-      - POSTGRES_DB=keycloak
-      - POSTGRES_USER=keycloak
-      - POSTGRES_PASSWORD=password
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
 
 volumes:
   postgres_data:
