@@ -25,4 +25,22 @@ public class SecurityConfig {
                         .jwt(withDefaults()));
         return http.build();
     }
+
+    @Bean
+    public OAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
+        final OidcUserService delegate = new OidcUserService();
+
+        return (userRequest) -> {
+            OidcUser oidcUser = delegate.loadUser(userRequest);
+
+            final Map<String, Object> claims = oidcUser.getClaims();
+            final JSONArray groups = (JSONArray) claims.get("groups");
+
+            final Set<GrantedAuthority> mappedAuthorities = groups.stream()
+                    .map(role -> new SimpleGrantedAuthority(("ROLE_" + role)))
+                    .collect(Collectors.toSet());
+
+            return new DefaultOidcUser(mappedAuthorities, oidcUser.getIdToken(), oidcUser.getUserInfo());
+        };
+    }
 }
