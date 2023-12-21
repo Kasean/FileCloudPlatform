@@ -2,4 +2,5 @@ rootProject.name = "FileGarbage"
 include 'core-back-end'
 include 'archiver'
 include 'artifact-processor'
+include 'data-processor'
 
