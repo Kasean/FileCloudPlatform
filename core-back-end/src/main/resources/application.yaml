@@ -1,0 +1,14 @@
+keycloak:
+  auth-server-url: http://localhost:8080/auth
+  realm: myrealm
+  resource: myclient
+  credentials:
+    secret: myclientsecret
+  security-constraints:
+    - securityCollections:
+      - name: secured area
+        authRoles:
+        - user
+        patterns:
+        - /secured/*
+  cors: true
