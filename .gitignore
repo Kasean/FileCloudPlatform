@@ -19,7 +19,7 @@ out/
 .factorypath
 .project
 .settings
-.springBeans
+.springBeansecho '.idea' >> .gitignore
 .sts4-cache
 bin/
 !**/src/main/**/bin/
