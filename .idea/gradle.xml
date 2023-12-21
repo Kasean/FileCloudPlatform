@@ -9,7 +9,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/file-garbage-core" />
+            <option value="$PROJECT_DIR$/core-back-end" />
           </set>
         </option>
       </GradleProjectSettings>
