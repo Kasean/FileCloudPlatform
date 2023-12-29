@@ -27,11 +27,15 @@ public class MessageConsumer {
     public void consume(String topic) {
         consumer.subscribe(Collections.singletonList(topic));
 
-        ConsumerRecords<String, byte[]> records = consumer.poll(Duration.ofMillis(1000));
-        if (!records.isEmpty()) {
-            for (ConsumerRecord<String, byte[]> record : records) {
-                System.out.println("Consumed message: " + new String(record.value()));
-            }
+        while (true) {
+            ConsumerRecords<String, byte[]> records = consumer.poll(Duration.ofMillis(100));
+            if (!records.isEmpty()) {
+                for (ConsumerRecord<String, byte[]> record : records) {
+                    System.out.println("Consumed message: " + new String(record.value()));
+                }
+            } else
+                System.out.println("No messages");
         }
+
     }
 }
