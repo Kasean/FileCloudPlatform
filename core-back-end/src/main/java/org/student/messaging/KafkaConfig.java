@@ -1,6 +1,5 @@
 package org.student.messaging;
 
-import jakarta.validation.Valid;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
