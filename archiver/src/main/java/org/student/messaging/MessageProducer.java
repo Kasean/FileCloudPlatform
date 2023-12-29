@@ -21,6 +21,6 @@ public class MessageProducer {
     }
 
     public void send(String topic, byte[] message) {
-        producer.send(new ProducerRecord<>(topic, message));
+        producer.send(new ProducerRecord<>(topic, 1, null, message));
     }
 }

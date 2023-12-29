@@ -4,10 +4,12 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
 
@@ -25,7 +27,8 @@ public class MessageConsumer {
     }
 
     public void consume(String topic) {
-        consumer.subscribe(Collections.singletonList(topic));
+        TopicPartition partition = new TopicPartition(topic, 0);
+        consumer.assign(Collections.singletonList(partition));
 
         while (true) {
             ConsumerRecords<String, byte[]> records = consumer.poll(Duration.ofMillis(100));
