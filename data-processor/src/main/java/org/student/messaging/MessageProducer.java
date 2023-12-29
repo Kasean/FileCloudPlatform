@@ -3,6 +3,7 @@ package org.student.messaging;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.student.messaging.topics.KafkaTopics;
 
 @Service
 public class MessageProducer {
@@ -13,6 +14,6 @@ public class MessageProducer {
     }
 
     public void send(byte[] message) {
-        template.send(new ProducerRecord<>("artifact-processor-topic", 1, null, message));
+        template.send(new ProducerRecord<>(KafkaTopics.DATA_PROCESSOR_TOPIC, 1, null, message));
     }
 }
