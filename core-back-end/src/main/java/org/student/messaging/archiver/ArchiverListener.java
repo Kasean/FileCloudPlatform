@@ -3,7 +3,7 @@ package org.student.messaging.archiver;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.stereotype.Service;
-import org.student.messaging.KafkaTopics;
+import org.student.messaging.topics.KafkaTopics;
 
 @Service
 public class ArchiverListener {

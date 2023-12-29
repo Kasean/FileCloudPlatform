@@ -3,7 +3,7 @@ package org.student.messaging.archiver;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import org.student.messaging.KafkaTopics;
+import org.student.messaging.topics.KafkaTopics;
 
 @Service
 public class ArchiverProducer {
