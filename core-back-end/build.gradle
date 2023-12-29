@@ -23,6 +23,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation group: 'org.keycloak', name: 'keycloak-spring-boot-adapter', version: '18.0.2'
     implementation 'org.keycloak:keycloak-admin-client:23.0.3'
+    implementation 'org.springframework.kafka:spring-kafka'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
 }
