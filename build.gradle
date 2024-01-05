@@ -21,9 +21,9 @@ subprojects {
 
         afterTest {desc, result ->
             if (result.resultType == TestResult.ResultType.SUCCESS) {
-                logger.lifecycle("Module: ${project.name}, Test result: Passed: ${desc.name}")
+                println("Module: ${project.name}, Test result: Passed: ${desc.name}")
             } else if (result.resultType == TestResult.ResultType.FAILURE) {
-                logger.lifecycle("Module: ${project.name}, Test result: Failed: ${desc.name}")
+                println("Module: ${project.name}, Test result: Failed: ${desc.name}")
             }
         }
     }
