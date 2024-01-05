@@ -3,6 +3,7 @@ apply plugin: 'java'
 group = "org.student"
 version = "1.0-SNAPSHOT"
 
+var showTestLogs = false
 
 subprojects {
 
@@ -10,6 +11,21 @@ subprojects {
 
     repositories {
         mavenCentral()
+    }
+
+    test {
+        testLogging {
+            events "passed", "skipped", "failed"
+            showStandardStreams = showTestLogs
+        }
+
+        afterTest {desc, result ->
+            if (result.resultType == TestResult.ResultType.SUCCESS) {
+                println("Module: ${project.name}, Test result: Passed: ${desc.name}")
+            } else if (result.resultType == TestResult.ResultType.FAILURE) {
+                println("Module: ${project.name}, Test result: Failed: ${desc.name}")
+            }
+        }
     }
 
     dependencies {
