@@ -1,4 +1,4 @@
-# SaaS project - cloud file storage + secret message sending. 
+# SaaS project - cloud file storage
 
 ![Java CI](https://github.com/Kasean/FileGarbage/actions/workflows/java_ci.yml/badge.svg)
 
