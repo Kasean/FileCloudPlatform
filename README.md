@@ -2,6 +2,8 @@
 
 ![Java CI](https://github.com/Kasean/FileGarbage/actions/workflows/java_ci.yml/badge.svg)
 
+## Stack: java 17, spring boot 3.x
+
 ## Documentation:
 
 ### Application ports:
