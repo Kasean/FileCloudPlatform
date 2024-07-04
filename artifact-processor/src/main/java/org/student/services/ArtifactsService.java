@@ -1,7 +1,11 @@
 package org.student.services;
 
+import java.util.UUID;
+
 public interface ArtifactsService {
 
-    void processArtifactMessage(byte[] artifactMessage);
+    void saveArtifactMessage(String key, byte[] artifactMessage);
+
+    byte[] getArtifactMessage(String key, UUID id);
 
 }

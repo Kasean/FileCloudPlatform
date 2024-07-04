@@ -20,7 +20,7 @@ public class MessageProducer {
         this.producer = new KafkaProducer<>(properties);
     }
 
-    public void send(String topic, byte[] message) {
-        producer.send(new ProducerRecord<>(topic, 1, null, message));
+    public void send(String topic, String key, byte[] message) {
+        producer.send(new ProducerRecord<>(topic, 1, key, message));
     }
 }

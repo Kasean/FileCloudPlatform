@@ -1,6 +1,7 @@
 package org.student;
 
 import org.student.configs.ApplicationConfig;
+import org.student.messaging.MessageConsumer;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.env.EnvScalarConstructor;
 
@@ -21,6 +22,10 @@ public class Application {
 		}
 
 		ApplicationConfig config = loadConfig(args[0]);
+
+		MessageConsumer consumer = new MessageConsumer(config); // TODO: work with api
+
+
 	}
 
 	private static ApplicationConfig loadConfig(String configFile) throws IOException {
