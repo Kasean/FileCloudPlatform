@@ -7,6 +7,6 @@
 1. core application - 8080
 2. keycloak - 9990
 
-### Hypothetical structure
+### Base structure
 
-![Structure](docs/structure.png)
+![Structure](docs/pictures/FileCloudStorageBaseStruct.png)
