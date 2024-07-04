@@ -7,6 +7,8 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.student.services.ArtifactsService;
+import org.student.services.ArtifactsServiceImpl;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -15,6 +17,7 @@ import java.util.Properties;
 public class MessageConsumer {
 
     private final KafkaConsumer<String, byte[]> consumer;
+    private final ArtifactsService artifactsService;
 
     public MessageConsumer(String bootstrapServers, String groupId) {
         Properties properties = new Properties();
@@ -23,6 +26,8 @@ public class MessageConsumer {
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class);
         this.consumer = new KafkaConsumer<>(properties);
+
+        this.artifactsService = new ArtifactsServiceImpl();
     }
 
     public void consume(String topic) {
@@ -34,6 +39,7 @@ public class MessageConsumer {
             if (!records.isEmpty()) {
                 for (ConsumerRecord<String, byte[]> record : records) {
                     System.out.println("Consumed message: " + new String(record.value()));
+                    artifactsService.processArtifactMessage(record.value());
                 }
             } else
                 System.out.println("No messages");
