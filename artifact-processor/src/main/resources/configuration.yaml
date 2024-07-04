@@ -1,0 +1,4 @@
+keyStore:
+  rootPassword: P@55w0rd
+  pathToKeyStore: artifact-processor/src/main/resources
+  defaultRSAAlias: RSAKey
