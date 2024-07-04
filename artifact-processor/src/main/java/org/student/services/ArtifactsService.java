@@ -4,8 +4,11 @@ import java.util.UUID;
 
 public interface ArtifactsService {
 
-    void saveArtifactMessage(String key, byte[] artifactMessage);
+    void createArtifactMessage(String key, byte[] artifactMessage);
 
-    byte[] getArtifactMessage(String key, UUID id);
+    void readArtifactMessage(String key, UUID id);
+
+    void updateArtifactMessage(String key, UUID id, byte[] newArtifactMessage); // TODO: not in alfa
+    void deleteArtifactMessage(String key, UUID id);
 
 }

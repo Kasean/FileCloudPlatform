@@ -1,7 +1,10 @@
 package org.student;
 
+import org.student.api.factories.ConsumerFactory;
 import org.student.configs.ApplicationConfig;
-import org.student.messaging.MessageConsumer;
+import org.student.api.consumers.MessageConsumer;
+import org.student.services.ArtifactsService;
+import org.student.services.ArtifactsServiceImpl;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.env.EnvScalarConstructor;
 
@@ -23,9 +26,11 @@ public class Application {
 
 		ApplicationConfig config = loadConfig(args[0]);
 
-		MessageConsumer consumer = new MessageConsumer(config); // TODO: work with api
+		ArtifactsService artifactsService = new ArtifactsServiceImpl(config);
 
+		var consumers = ConsumerFactory.createConsumers(config.getKafka(), artifactsService);
 
+		consumers.forEach(c -> c.consume());
 	}
 
 	private static ApplicationConfig loadConfig(String configFile) throws IOException {

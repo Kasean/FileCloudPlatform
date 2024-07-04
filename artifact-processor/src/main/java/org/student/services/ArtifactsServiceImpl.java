@@ -3,7 +3,7 @@ package org.student.services;
 import org.student.archiver.ArchiverService;
 import org.student.archiver.ArchiverServiceImpl;
 import org.student.configs.ApplicationConfig;
-import org.student.messaging.MessageProducer;
+import org.student.api.MessageProducer;
 import org.student.repositories.ArtifactsIMStorage;
 import org.student.repositories.ArtifactsRepository;
 
@@ -22,7 +22,7 @@ public class ArtifactsServiceImpl implements ArtifactsService {
     }
 
     @Override
-    public void saveArtifactMessage(String key, byte[] artifactMessage) {
+    public void createArtifactMessage(String key, byte[] artifactMessage) {
         var artifact = archiver.encrypt(artifactMessage);
 
         var id = repository.saveArtifact(artifact);
@@ -31,9 +31,20 @@ public class ArtifactsServiceImpl implements ArtifactsService {
     }
 
     @Override
-    public byte[] getArtifactMessage(String key, UUID id) {
+    public void readArtifactMessage(String key, UUID id) {
         var encryptArtifact = repository.getArtifact(id).orElseThrow(() -> new IllegalArgumentException("Artifact with id " + id + " not founded."));
 
-        return archiver.decrypt(encryptArtifact).getArtifactData();
+        var res =  archiver.decrypt(encryptArtifact).getArtifactData();
+        // TODO: send to producer;
+    }
+
+    @Override
+    public void updateArtifactMessage(String key, UUID id, byte[] newArtifactMessage) { // Not implemented
+
+    }
+
+    @Override
+    public void deleteArtifactMessage(String key, UUID id) { // Not implemented
+
     }
 }
