@@ -10,3 +10,7 @@
 ### Base structure
 
 ![Structure](docs/pictures/FileCloudStorageBaseStruct.png)
+
+#### Modules structure examples
+
+![ArtifactProcessorStructure](docs/pictures/ArtifactProcessorBaseStructure.png)
