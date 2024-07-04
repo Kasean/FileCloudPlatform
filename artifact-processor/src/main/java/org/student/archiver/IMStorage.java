@@ -14,4 +14,9 @@ public class IMStorage implements ArchiverRepository{
     public void saveArtifactAlias(ArtifactMetaInfo metaInfo, String alias) {
         aliasCache.put(metaInfo.getInternalKeyStoreId(), alias);
     }
+
+    @Override
+    public String getArtifactAlias(ArtifactMetaInfo metaInfo) {
+        return aliasCache.get(metaInfo.getInternalKeyStoreId());
+    }
 }

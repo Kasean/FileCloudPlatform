@@ -25,6 +25,9 @@ public class ArchiverServiceImpl implements ArchiverService {
     private static final String SKIP_ENCRYPTION = " Skip encryption.";
     private static final String RSA = "RSA";
     private static final String ALIAS_PATTERN = "%s%s";
+    private static final String SKIP_DECRYPTION = " Skip decryption.";
+
+    private final KeyStore keyStore;
     private final char[] rootPassword;
     private final String pathToKeyStore;
     private final ArchiverRepository archiverRepository = new IMStorage(); // TODO: add choice in config: real db or in memory storage
@@ -34,7 +37,11 @@ public class ArchiverServiceImpl implements ArchiverService {
         this.rootPassword = config.getRootPassword().toCharArray();
         this.pathToKeyStore = config.getPathToKeyStore();
         this.defaultRSAAlias = config.getDefaultRSAAlias();
+
+        this.keyStore = getInstance(rootPassword, pathToKeyStore);
     }
+
+    @Override
     public Artifact encrypt(byte[] rawArtifactMessage) {
 
         Artifact artifact = new Artifact(rawArtifactMessage);
@@ -42,7 +49,6 @@ public class ArchiverServiceImpl implements ArchiverService {
         KeyPair keyPair = generateKeyPair();
         if (keyPair == null) return artifact;
 
-        KeyStore keyStore = getInstance(rootPassword, pathToKeyStore);
         if (keyStore == null) return artifact;
 
         if (!loadKeyStore(keyStore)) return artifact;
@@ -139,6 +145,64 @@ public class ArchiverServiceImpl implements ArchiverService {
         } catch (IllegalBlockSizeException | BadPaddingException e) {
             System.err.println("Error in encrypting bytes array:" + e.getMessage() + e + SKIP_ENCRYPTION);
             return artifact;
+        }
+    }
+
+    @Override
+    public Artifact decrypt(Artifact encryptedArtifact) {
+
+        if (keyStore == null) return encryptedArtifact;
+
+        if (!loadKeyStore(keyStore)) return encryptedArtifact;
+
+        PrivateKey privateKey = getPrivateKeyFromKeyStore(keyStore, archiverRepository.getArtifactAlias(encryptedArtifact.getMetaInfo()));
+        if (privateKey == null) return encryptedArtifact;
+
+        Cipher cipher = createCipher();
+        if (cipher == null) return encryptedArtifact;
+
+        if (!initCipherForDecryption(cipher, privateKey)) return encryptedArtifact;
+
+        var decrypted = decryptByteArray(cipher, encryptedArtifact);
+        if (decrypted.length == 0) return encryptedArtifact;
+
+        encryptedArtifact.setArtifactData(decrypted);
+
+        return encryptedArtifact;
+    }
+
+    private PrivateKey getPrivateKeyFromKeyStore(KeyStore keyStore, String artifactAlias) {
+
+        if (artifactAlias == null){
+            System.err.println("Null alias!!!" + SKIP_DECRYPTION);
+            return null;
+        }
+
+        try {
+            KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(artifactAlias, new KeyStore.PasswordProtection(rootPassword));
+            return privateKeyEntry.getPrivateKey();
+        } catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException e) {
+            System.err.println("Error in getting private key from KeyStore:" + e.getMessage() + e + SKIP_DECRYPTION);
+            return null;
+        }
+    }
+
+    private boolean initCipherForDecryption(Cipher cipher, PrivateKey privateKey) {
+        try {
+            cipher.init(Cipher.DECRYPT_MODE, privateKey);
+            return true;
+        } catch (InvalidKeyException e) {
+            System.err.println("Error in initing Cipher for decryption:" + e.getMessage() + e + SKIP_DECRYPTION);
+            return false;
+        }
+    }
+
+    private byte[] decryptByteArray(Cipher cipher, Artifact encryptedMessage) {
+        try {
+            return cipher.doFinal(encryptedMessage.getArtifactData());
+        } catch (IllegalBlockSizeException | BadPaddingException e) {
+            System.err.println("Error in decrypting bytes array:" + e.getMessage() + e + SKIP_DECRYPTION);
+            return new byte[0];
         }
     }
 }
