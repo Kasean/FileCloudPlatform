@@ -30,7 +30,7 @@ public class ArchiverServiceImpl implements ArchiverService {
     private final KeyStore keyStore;
     private final char[] rootPassword;
     private final String pathToKeyStore;
-    private final ArchiverRepository archiverRepository = new IMStorage(); // TODO: add choice in config: real db or in memory storage
+    private final ArchiverRepository archiverRepository = new ArchiverIMStorage(); // TODO: add choice in config: real db or in memory storage
     private final String defaultRSAAlias;
 
     public ArchiverServiceImpl(KeyStoreConfig config) {

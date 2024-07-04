@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class IMStorage implements ArchiverRepository{
+public class ArchiverIMStorage implements ArchiverRepository{
 
     private final Map<UUID, String> aliasCache = new HashMap<>();
 
