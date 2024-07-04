@@ -24,5 +24,5 @@
 ![ArtifactProcessorStructure](docs/pictures/ArtifactProcessorBaseStructure.png)
 
 Core data storage and Archiver data storage modules - in alfa version this is simple in memory storage (Map for example). 
-In first beta version - ![Riak KV](https://riak.com/products/integrations/)
+In first beta version - ![Riak KV](https://riak.com/products/integrations/) or Apache cassandra
 
