@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.student.archiver.KeyStoreManager.getInstance;
@@ -154,7 +155,6 @@ public class ArchiverServiceImpl implements ArchiverService {
         if (keyStore == null) return encryptedArtifact;
 
         if (!loadKeyStore(keyStore)) return encryptedArtifact;
-
         PrivateKey privateKey = getPrivateKeyFromKeyStore(keyStore, archiverRepository.getArtifactAlias(encryptedArtifact.getMetaInfo()));
         if (privateKey == null) return encryptedArtifact;
 
@@ -171,12 +171,14 @@ public class ArchiverServiceImpl implements ArchiverService {
         return encryptedArtifact;
     }
 
-    private PrivateKey getPrivateKeyFromKeyStore(KeyStore keyStore, String artifactAlias) {
+    private PrivateKey getPrivateKeyFromKeyStore(KeyStore keyStore, Optional<String> artifactAliasOpt) {
 
-        if (artifactAlias == null){
+        if (artifactAliasOpt.isEmpty()){
             System.err.println("Null alias!!!" + SKIP_DECRYPTION);
             return null;
         }
+
+        var artifactAlias = artifactAliasOpt.get();
 
         try {
             KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(artifactAlias, new KeyStore.PasswordProtection(rootPassword));

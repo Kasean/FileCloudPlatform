@@ -4,6 +4,7 @@ import org.student.models.ArtifactMetaInfo;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class ArchiverIMStorage implements ArchiverRepository{
@@ -16,7 +17,9 @@ public class ArchiverIMStorage implements ArchiverRepository{
     }
 
     @Override
-    public String getArtifactAlias(ArtifactMetaInfo metaInfo) {
-        return aliasCache.get(metaInfo.getInternalKeyStoreId());
+    public Optional<String> getArtifactAlias(ArtifactMetaInfo metaInfo) {
+        var alias =  aliasCache.get(metaInfo.getInternalKeyStoreId());
+
+        return alias == null ? Optional.empty() : Optional.of(alias);
     }
 }
