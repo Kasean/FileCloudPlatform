@@ -1,0 +1,15 @@
+keyStore:
+  rootPassword: P@55w0rd
+  pathToKeyStore: artifact-processor/src/main/resources
+  defaultRSAAlias: RSAKey
+
+kafka:
+  # host:port
+  bootstrapServers: localhost:090909
+  # String value with groupId
+  groupId: groupId
+  # String sets with topics names
+  topicsForCreate: tpc1, tpc2
+  topicsForRead: tpr1, tpr2
+  topicsForUpdate: tru1, tpu2
+  topicsForDelete: tpd1,tpd2
