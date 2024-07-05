@@ -11,6 +11,8 @@ repositories {
 
 dependencies {
 
+    implementation project(':messaging-api')
+
     implementation 'org.yaml:snakeyaml:2.0'
 
     implementation 'org.apache.kafka:kafka-clients:3.4.0'

@@ -6,7 +6,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.student.api.VoidBiFunction;
+import org.student.api.ProcessMessageFunction;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -15,10 +15,10 @@ import java.util.UUID;
 
 public class ReadConsumer implements MessageConsumer{
     private final KafkaConsumer<String, String> consumer;
-    private final VoidBiFunction<String, UUID> service;
+    private final ProcessMessageFunction<String, UUID, String> service;
     private final String topic;
 
-    public ReadConsumer(String bootstrapServers, String groupId, String topic, VoidBiFunction<String, UUID> service) {
+    public ReadConsumer(String bootstrapServers, String groupId, String topic, ProcessMessageFunction<String, UUID, String> service) {
         Properties properties = new Properties();
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
@@ -40,7 +40,7 @@ public class ReadConsumer implements MessageConsumer{
             if (!records.isEmpty()) {
                 for (ConsumerRecord<String, String> record : records) {
                     System.out.println("Consumed message: " + record.value());
-                    service.accept(record.key(), UUID.fromString(record.value()));
+                    service.accept(record.key(), UUID.fromString(record.value()), topic);
                 }
             } else
                 System.out.println("No messages");
