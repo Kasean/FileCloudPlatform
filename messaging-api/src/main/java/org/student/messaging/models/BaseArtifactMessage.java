@@ -23,4 +23,12 @@ public class BaseArtifactMessage {
     public void setResponseCode(ResponseCode responseCode) {
         this.responseCode = responseCode;
     }
+
+    @Override
+    public String toString() {
+        return "BaseArtifactMessage{" +
+                "internalId=" + internalId +
+                ", responseCode=" + responseCode +
+                '}';
+    }
 }
