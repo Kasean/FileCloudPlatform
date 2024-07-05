@@ -26,7 +26,7 @@ public class UpdateConsumer implements MessageConsumer{
     }
 
     @Override
-    public void consume(String topic) {
+    public void consume() { // Not implemented
 
     }
 }

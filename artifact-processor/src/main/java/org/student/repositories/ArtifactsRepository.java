@@ -11,4 +11,6 @@ public interface ArtifactsRepository {
 
     Optional<Artifact> getArtifact(UUID id);
 
+    Artifact deleteArtifact(UUID id);
+
 }

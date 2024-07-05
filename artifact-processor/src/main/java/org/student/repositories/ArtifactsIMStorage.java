@@ -2,7 +2,6 @@ package org.student.repositories;
 
 import org.student.models.Artifact;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,5 +23,10 @@ public class ArtifactsIMStorage implements ArtifactsRepository{
         var artifact = artifactStorage.get(id);
 
         return artifact == null ? Optional.empty() : Optional.of(artifact);
+    }
+
+    @Override
+    public Artifact deleteArtifact(UUID id) {
+        return artifactStorage.remove(id);
     }
 }

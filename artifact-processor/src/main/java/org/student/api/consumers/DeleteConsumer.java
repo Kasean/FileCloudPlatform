@@ -1,16 +1,20 @@
 package org.student.api.consumers;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.common.serialization.ByteArrayDeserializer;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.student.api.VoidBiFunction;
 
+import java.time.Duration;
+import java.util.Collections;
 import java.util.Properties;
 import java.util.UUID;
 
 public class DeleteConsumer  implements MessageConsumer{
-    private final KafkaConsumer<String, byte[]> consumer;
+    private final KafkaConsumer<String, String> consumer;
     private final VoidBiFunction<String, UUID> service;
     private final String topic;
 
@@ -19,7 +23,7 @@ public class DeleteConsumer  implements MessageConsumer{
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class);
+        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         this.consumer = new KafkaConsumer<>(properties);
 
         this.service = service;
@@ -28,6 +32,18 @@ public class DeleteConsumer  implements MessageConsumer{
 
     @Override
     public void consume() {
+        TopicPartition partition = new TopicPartition(topic, 0);
+        consumer.assign(Collections.singletonList(partition));
 
+        while (true) {
+            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
+            if (!records.isEmpty()) {
+                for (ConsumerRecord<String, String> record : records) {
+                    System.out.println("Consumed message: " + record.value());
+                    service.accept(record.key(), UUID.fromString(record.value()));
+                }
+            } else
+                System.out.println("No messages");
+        }
     }
 }

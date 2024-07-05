@@ -44,7 +44,11 @@ public class ArtifactsServiceImpl implements ArtifactsService {
     }
 
     @Override
-    public void deleteArtifactMessage(String key, UUID id) { // Not implemented
+    public void deleteArtifactMessage(String key, UUID id) {
+        var encryptedDeletedArtifact = repository.deleteArtifact(id);
 
+        var res = archiver.decrypt(encryptedDeletedArtifact).getArtifactData();
+
+        // TODO: send to producer;
     }
 }
