@@ -71,4 +71,9 @@ public class ArtifactsServiceImpl implements ArtifactsService {
 
         producer.send(topic, key, BodyArtifactMessage.class, artifactResponse);
     }
+
+    @Override
+    public void shutdown() {
+        archiver.shutdown();
+    }
 }

@@ -35,12 +35,18 @@ public class KeyStoreManager {
         try {
             Path path = Paths.get(pathToKeyStore + "/keystore.jks");
             try (InputStream fis = Files.newInputStream(path)) {
+                instance = KeyStore.getInstance("JKS");
                 instance.load(fis, rootPassword);
             }
         } catch (IOException | NoSuchAlgorithmException | CertificateException e) {
             System.err.println("Error in loading KeyStore from ROM:" + e.getMessage() + e + " Create new instance.");
 
             instance = KeyStore.getInstance("JKS");
+            try {
+                instance.load(null, rootPassword);
+            } catch (IOException | CertificateException | NoSuchAlgorithmException ex) {
+                System.err.println("Key store initialization failed: " + e.getMessage() + e);
+            }
         }
     }
 

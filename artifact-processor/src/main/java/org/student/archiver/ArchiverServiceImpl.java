@@ -1,5 +1,11 @@
 package org.student.archiver;
 
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.student.configs.KeyStoreConfig;
 import org.student.models.Artifact;
 import org.student.models.ArtifactMetaInfo;
@@ -8,14 +14,19 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,6 +38,7 @@ public class ArchiverServiceImpl implements ArchiverService {
     private static final String RSA = "RSA";
     private static final String ALIAS_PATTERN = "%s%s";
     private static final String SKIP_DECRYPTION = " Skip decryption.";
+    private static final String KEYSTORE_JKS_ROOT_PATH = "/keystore.jks";
 
     private final KeyStore keyStore;
     private final char[] rootPassword;
@@ -60,10 +72,8 @@ public class ArchiverServiceImpl implements ArchiverService {
 
         PublicKey publicKey = keyPair.getPublic();
 
-        Cipher cipher = createCipher();
+        Cipher cipher = createCipher(Cipher.ENCRYPT_MODE, publicKey);
         if (cipher == null) return artifact;
-
-        if (!initCipher(cipher, publicKey)) return artifact;
 
         return encryptByteArray(cipher, artifact);
     }
@@ -90,7 +100,19 @@ public class ArchiverServiceImpl implements ArchiverService {
     }
 
     private boolean addPrivateKeyToKeyStore(KeyStore keyStore, KeyPair keyPair, ArtifactMetaInfo metaInfo) {
-        KeyStore.PrivateKeyEntry privateKeyEntry = new KeyStore.PrivateKeyEntry(keyPair.getPrivate(), new Certificate[]{});
+
+        long validity = 100 * 365 * 24 * 60 * 60; // 100 years
+        String sigAlgName = "SHA256WithRSA";
+
+        Certificate certificate = null;
+        try {
+            certificate = generateSelfSignedCertificate(keyPair, "CN=Test", validity, sigAlgName);
+        } catch (Exception e) {
+            System.err.println("Error creating certificate: " + e.getMessage() + e + SKIP_ENCRYPTION);
+            return false;
+        }
+
+        KeyStore.PrivateKeyEntry privateKeyEntry = new KeyStore.PrivateKeyEntry(keyPair.getPrivate(), new Certificate[]{certificate});
         try {
             var alias = generateAlias();
             keyStore.setEntry(alias, privateKeyEntry, new KeyStore.PasswordProtection(rootPassword));
@@ -102,13 +124,34 @@ public class ArchiverServiceImpl implements ArchiverService {
         }
     }
 
+    private Certificate generateSelfSignedCertificate(KeyPair keyPair, String dn, long validity, String sigAlgName) throws Exception {
+        X500Name issuerName = new X500Name(dn);
+        BigInteger serial = BigInteger.valueOf(new SecureRandom().nextInt());
+
+        Date from = new Date();
+        Date to = new Date(from.getTime() + validity * 1000);
+
+        SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(keyPair.getPublic().getEncoded());
+
+        X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(issuerName, serial, from, to, issuerName, publicKeyInfo);
+
+        ContentSigner signer = new JcaContentSignerBuilder(sigAlgName).build(keyPair.getPrivate());
+
+        X509CertificateHolder certHolder = certBuilder.build(signer);
+
+        CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+
+        return certFactory.generateCertificate(new ByteArrayInputStream(certHolder.getEncoded()));
+    }
+
     private String generateAlias() {
         return String.format(ALIAS_PATTERN, defaultRSAAlias, UUID.randomUUID());
     }
 
     private boolean saveKeyStoreToDisk(KeyStore keyStore) {
         try {
-            Path path = Paths.get(pathToKeyStore + "/keystore.jks");
+            Path path = Paths.get(pathToKeyStore + KEYSTORE_JKS_ROOT_PATH);
+            Files.createDirectories(path.getParent());
             try (OutputStream fos = Files.newOutputStream(path)) {
                 keyStore.store(fos, rootPassword);
             }
@@ -119,22 +162,14 @@ public class ArchiverServiceImpl implements ArchiverService {
         }
     }
 
-    private Cipher createCipher() {
+    private Cipher createCipher(int mode, Key key) {
         try {
-            return Cipher.getInstance(RSA);
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+            var instance =  Cipher.getInstance(RSA);
+            instance.init(mode, key);
+            return instance;
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
             System.err.println("Error in instancing Cipher:" + e.getMessage() + e + SKIP_ENCRYPTION);
             return null;
-        }
-    }
-
-    private boolean initCipher(Cipher cipher, PublicKey publicKey) {
-        try {
-            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-            return true;
-        } catch (InvalidKeyException e) {
-            System.err.println("Error in initing Cipher:" + e.getMessage() + e + SKIP_ENCRYPTION);
-            return false;
         }
     }
 
@@ -154,14 +189,11 @@ public class ArchiverServiceImpl implements ArchiverService {
 
         if (keyStore == null) return encryptedArtifact;
 
-        if (!loadKeyStore(keyStore)) return encryptedArtifact;
         PrivateKey privateKey = getPrivateKeyFromKeyStore(keyStore, archiverRepository.getArtifactAlias(encryptedArtifact.getMetaInfo()));
         if (privateKey == null) return encryptedArtifact;
 
-        Cipher cipher = createCipher();
+        Cipher cipher = createCipher(Cipher.DECRYPT_MODE, privateKey);
         if (cipher == null) return encryptedArtifact;
-
-        if (!initCipherForDecryption(cipher, privateKey)) return encryptedArtifact;
 
         var decrypted = decryptByteArray(cipher, encryptedArtifact);
         if (decrypted.length == 0) return encryptedArtifact;
@@ -169,6 +201,11 @@ public class ArchiverServiceImpl implements ArchiverService {
         encryptedArtifact.setArtifactData(decrypted);
 
         return encryptedArtifact;
+    }
+
+    @Override
+    public void shutdown() {
+        saveKeyStoreToDisk(keyStore);
     }
 
     private PrivateKey getPrivateKeyFromKeyStore(KeyStore keyStore, Optional<String> artifactAliasOpt) {
@@ -181,21 +218,18 @@ public class ArchiverServiceImpl implements ArchiverService {
         var artifactAlias = artifactAliasOpt.get();
 
         try {
-            KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(artifactAlias, new KeyStore.PasswordProtection(rootPassword));
-            return privateKeyEntry.getPrivateKey();
-        } catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException e) {
-            System.err.println("Error in getting private key from KeyStore:" + e.getMessage() + e + SKIP_DECRYPTION);
-            return null;
-        }
-    }
 
-    private boolean initCipherForDecryption(Cipher cipher, PrivateKey privateKey) {
-        try {
-            cipher.init(Cipher.DECRYPT_MODE, privateKey);
-            return true;
-        } catch (InvalidKeyException e) {
-            System.err.println("Error in initing Cipher for decryption:" + e.getMessage() + e + SKIP_DECRYPTION);
-            return false;
+            Key key = keyStore.getKey(artifactAlias, rootPassword);
+            if (key instanceof PrivateKey) {
+                PrivateKey privateKey = (PrivateKey) key;
+                return privateKey;
+            } else {
+                System.err.println("Error in getting private key from KeyStore: not founded key in store." + SKIP_ENCRYPTION);
+                return null;
+            }
+        } catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException e) {
+            System.err.println("Error in getting private key from KeyStore: " + e.getMessage() + e + SKIP_DECRYPTION);
+            return null;
         }
     }
 

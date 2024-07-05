@@ -12,7 +12,6 @@ public class KafkaSendFacadeImpl implements KafkaSendFacade {
     private final Map<String, MessageProducer> producers = new ConcurrentHashMap<>();
     private final String bootstrapServer;
 
-
     public KafkaSendFacadeImpl(String bootstrapServer) {
         this.bootstrapServer = bootstrapServer;
     }

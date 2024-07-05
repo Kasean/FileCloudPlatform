@@ -1,4 +1,4 @@
-package org.student.api;
+package org.student.api.utils;
 
 @FunctionalInterface
 public interface ProcessMessageFunction<F, S, T>{

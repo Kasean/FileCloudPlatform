@@ -11,4 +11,6 @@ public interface ArtifactsService {
     void updateArtifactMessage(String key, UUID id, byte[] newArtifactMessage); // TODO: not in alfa
     void deleteArtifactMessage(String key, UUID id, String topic);
 
+    void shutdown();
+
 }

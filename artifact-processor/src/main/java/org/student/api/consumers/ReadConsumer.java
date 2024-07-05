@@ -6,7 +6,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.student.api.ProcessMessageFunction;
+import org.student.api.utils.ProcessMessageFunction;
 
 import java.time.Duration;
 import java.util.Collections;

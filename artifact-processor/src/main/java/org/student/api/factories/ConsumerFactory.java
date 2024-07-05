@@ -1,6 +1,6 @@
 package org.student.api.factories;
 
-import org.student.api.OperationType;
+import org.student.api.utils.OperationType;
 import org.student.api.consumers.CreateConsumer;
 import org.student.api.consumers.DeleteConsumer;
 import org.student.api.consumers.MessageConsumer;

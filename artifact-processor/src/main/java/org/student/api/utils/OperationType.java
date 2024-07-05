@@ -1,4 +1,4 @@
-package org.student.api;
+package org.student.api.utils;
 
 public enum OperationType {
     CREATE, READ, UPDATE, DELETE
