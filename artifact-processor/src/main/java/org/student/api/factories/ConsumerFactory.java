@@ -39,15 +39,15 @@ public class ConsumerFactory {
     }
 
     private static List<? extends MessageConsumer> createReadConsumers(KafkaConfig config, ArtifactsService service) {
-        return config.getTopicsForRead().stream().map(topic -> new ReadConsumer(config.getBootstrapServers(), config.getGroupId(), service::readArtifactMessage)).toList();
+        return config.getTopicsForRead().stream().map(topic -> new ReadConsumer(config.getBootstrapServers(), config.getGroupId(), topic, service::readArtifactMessage)).toList();
     }
 
     private static List<? extends MessageConsumer> createCreateConsumers(KafkaConfig config, ArtifactsService service) {
-        return config.getTopicsForCreate().stream().map(topic -> new CreateConsumer(config.getBootstrapServers(), config.getGroupId(), service::createArtifactMessage)).toList();
+        return config.getTopicsForCreate().stream().map(topic -> new CreateConsumer(config.getBootstrapServers(), config.getGroupId(), topic, service::createArtifactMessage)).toList();
     }
 
     private static List<? extends MessageConsumer> createDeleteConsumers(KafkaConfig config, ArtifactsService service) {
-        return config.getTopicsForDelete().stream().map(topic -> new DeleteConsumer(config.getBootstrapServers(), config.getGroupId(), service::deleteArtifactMessage)).toList();
+        return config.getTopicsForDelete().stream().map(topic -> new DeleteConsumer(config.getBootstrapServers(), config.getGroupId(), topic, service::deleteArtifactMessage)).toList();
     }
 
     private static List<? extends MessageConsumer> createUpdateConsumers(KafkaConfig config, ArtifactsService service) {

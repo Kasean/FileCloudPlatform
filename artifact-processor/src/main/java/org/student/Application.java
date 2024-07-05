@@ -1,6 +1,8 @@
 package org.student;
 
 import org.student.api.factories.ConsumerFactory;
+import org.student.api.managers.ConsumersManager;
+import org.student.api.managers.ConsumersManagerImpl;
 import org.student.configs.ApplicationConfig;
 import org.student.api.consumers.MessageConsumer;
 import org.student.services.ArtifactsService;
@@ -12,25 +14,42 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.yaml.snakeyaml.env.EnvScalarConstructor.ENV_FORMAT;
 import static org.yaml.snakeyaml.env.EnvScalarConstructor.ENV_TAG;
 
 public class Application {
+
+	private static final AtomicReference<ConsumersManager> consumersManager = new AtomicReference<>(null);
+
 	public static void main(String[] args) throws IOException {
 
 		if (args.length != 1) {
 			System.err.println("Config missing.");
 			return;
 		}
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			System.out.println("Shutdown hook is running!");
+
+			if (consumersManager.get() != null){
+				consumersManager.get().shutdown();
+			}
+
+		}));
 
 		ApplicationConfig config = loadConfig(args[0]);
 
-		ArtifactsService artifactsService = new ArtifactsServiceImpl(config);
+		new Thread(() -> {
+			ArtifactsService artifactsService = new ArtifactsServiceImpl(config);
 
-		var consumers = ConsumerFactory.createConsumers(config.getKafka(), artifactsService);
+			var consumers = ConsumerFactory.createConsumers(config.getKafka(), artifactsService);
 
-		consumers.forEach(c -> c.consume());
+			if (consumersManager.get() == null) {
+				consumersManager.set(new ConsumersManagerImpl(consumers));
+				consumersManager.get().startListenMessages();
+			}
+		}).start();
 	}
 
 	private static ApplicationConfig loadConfig(String configFile) throws IOException {

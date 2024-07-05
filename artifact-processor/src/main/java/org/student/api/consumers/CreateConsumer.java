@@ -16,8 +16,9 @@ import java.util.Properties;
 public class CreateConsumer implements MessageConsumer{
     private final KafkaConsumer<String, byte[]> consumer;
     private final VoidBiFunction<String, byte[]> service;
+    private final String topic;
 
-    public CreateConsumer(String bootstrapServers, String groupId, VoidBiFunction<String, byte[]> service) {
+    public CreateConsumer(String bootstrapServers, String groupId, String topic, VoidBiFunction<String, byte[]> service) {
         Properties properties = new Properties();
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
@@ -26,11 +27,12 @@ public class CreateConsumer implements MessageConsumer{
         this.consumer = new KafkaConsumer<>(properties);
 
         this.service = service;
+        this.topic = topic;
     }
 
 
     @Override
-    public void consume(String topic) {
+    public void consume() {
         TopicPartition partition = new TopicPartition(topic, 0);
         consumer.assign(Collections.singletonList(partition));
 
