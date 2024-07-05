@@ -6,10 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ArchiverIMStorage implements ArchiverRepository{
 
-    private final Map<UUID, String> aliasCache = new HashMap<>();
+    private final Map<UUID, String> aliasCache = new ConcurrentHashMap<>();
 
     @Override
     public void saveArtifactAlias(ArtifactMetaInfo metaInfo, String alias) {

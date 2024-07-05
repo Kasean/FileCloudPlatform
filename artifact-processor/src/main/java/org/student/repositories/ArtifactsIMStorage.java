@@ -6,10 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ArtifactsIMStorage implements ArtifactsRepository{
 
-    private final Map<UUID, Artifact> artifactStorage = new HashMap<>();
+    private final Map<UUID, Artifact> artifactStorage = new ConcurrentHashMap<>();
 
     @Override
     public UUID saveArtifact(Artifact artifact) {
