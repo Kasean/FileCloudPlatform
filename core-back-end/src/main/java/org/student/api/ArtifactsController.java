@@ -1,22 +1,23 @@
 package org.student.api;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.student.api.models.ArtifactCreateRequest;
-import org.student.api.models.ArtifactCreateResponce;
+import org.student.api.models.ArtifactResponse;
 import reactor.core.publisher.Mono;
 
-@RestController
-@RequestMapping("api/v1/artifacts")
-public class ArtifactsController {
+import java.util.List;
+import java.util.UUID;
 
-    private static final Logger logger = LogManager.getLogger(ArtifactsController.class);
-
+public interface ArtifactsController {
     @PostMapping("/upload")
-    public Mono<ArtifactCreateResponce> uploadFile(@RequestBody ArtifactCreateRequest request) {
-        logger.info("Received artifact: {}", request.toString());
-        return Mono.just(new ArtifactCreateResponce());
-    }
+    Mono<ArtifactResponse> uploadFile(@RequestBody ArtifactCreateRequest request);
 
+    @GetMapping("/getAll")
+    Mono<List<ArtifactResponse>> getAllFiles();
+
+    @GetMapping("/loadArtifact/{id}")
+    Mono<ArtifactResponse> loadArtifact(@PathVariable UUID id);
 }

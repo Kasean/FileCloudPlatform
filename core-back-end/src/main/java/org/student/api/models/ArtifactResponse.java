@@ -2,17 +2,17 @@ package org.student.api.models;
 
 import java.util.UUID;
 
-public class ArtifactCreateResponce {
+public class ArtifactResponse {
     private UUID id;
 
     private ArtifactMateInfo metaInfo;
 
-    public ArtifactCreateResponce(UUID id, ArtifactMateInfo metaInfo) {
+    public ArtifactResponse(UUID id, ArtifactMateInfo metaInfo) {
         this.id = id;
         this.metaInfo = metaInfo;
     }
 
-    public ArtifactCreateResponce() {
+    public ArtifactResponse() {
     }
 
     public UUID getId() {

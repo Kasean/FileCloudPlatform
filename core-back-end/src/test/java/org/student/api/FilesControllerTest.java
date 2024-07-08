@@ -14,7 +14,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 
 @ExtendWith(SpringExtension.class)
-@WebFluxTest(ArtifactsController.class)
+@WebFluxTest(ArtifactsControllerImpl.class)
 public class FilesControllerTest {
 
     @Autowired
