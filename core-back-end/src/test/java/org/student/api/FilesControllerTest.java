@@ -108,4 +108,23 @@ class FilesControllerTest {
 
         Mockito.verify(artifactsService).getArtifactById(id);
     }
+
+    @Test
+    @WithMockUser(username = "user")
+    void testArtDeleting() {
+        UUID id = UUID.randomUUID();
+        String name = "Test name";
+        byte[] body = new byte[0];
+
+        ArtifactResponse response = new ArtifactResponse(id, new ArtifactMateInfo(name, body.length));
+
+        Mockito.when(artifactsService.deleteArtifact(id)).thenReturn(Mono.just(response));
+
+        webTestClient.mutateWith(SecurityMockServerConfigurers.csrf()).delete().uri("http://localhost:8888/api/v1/artifacts/deleteArtifact/" + id)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ArtifactResponse.class).isEqualTo(response);
+
+        Mockito.verify(artifactsService).deleteArtifact(id);
+    }
 }

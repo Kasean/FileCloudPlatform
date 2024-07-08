@@ -18,4 +18,6 @@ public interface ArtifactsService {
     Flux<ArtifactResponse> getAllArtifacts();
 
     Mono<ArtifactLoadResponse> getArtifactById(UUID id);
+
+    Mono<ArtifactResponse> deleteArtifact(UUID id);
 }
