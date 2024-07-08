@@ -1,5 +1,6 @@
 package org.student.api.models;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class ArtifactResponse {
@@ -37,5 +38,18 @@ public class ArtifactResponse {
                 "id=" + id +
                 ", metaInfo=" + metaInfo +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ArtifactResponse response = (ArtifactResponse) o;
+        return Objects.equals(id, response.id) && Objects.equals(metaInfo, response.metaInfo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, metaInfo);
     }
 }

@@ -31,4 +31,17 @@ public class ArtifactLoadResponse extends ArtifactResponse{
                 "artifactBody=" + Arrays.toString(artifactBody) +
                 "} " + super.toString();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ArtifactLoadResponse that = (ArtifactLoadResponse) o;
+        return Arrays.equals(artifactBody, that.artifactBody);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(artifactBody);
+    }
 }

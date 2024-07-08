@@ -1,5 +1,7 @@
 package org.student.api.models;
 
+import java.util.Objects;
+
 public class ArtifactMateInfo {
     private String artifactName;
     private long artifactSize;
@@ -34,5 +36,18 @@ public class ArtifactMateInfo {
                 "artifactName='" + artifactName + '\'' +
                 ", artifactSize=" + artifactSize +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ArtifactMateInfo that = (ArtifactMateInfo) o;
+        return artifactSize == that.artifactSize && Objects.equals(artifactName, that.artifactName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(artifactName, artifactSize);
     }
 }
