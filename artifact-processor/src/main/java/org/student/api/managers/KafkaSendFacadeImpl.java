@@ -2,7 +2,7 @@ package org.student.api.managers;
 
 import org.student.api.producers.MessageProducer;
 import org.student.api.producers.MessageProducerImpl;
-import org.student.messaging.models.BaseArtifactMessage;
+import org.student.messaging.models.apmessages.BaseArtifactMessage;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

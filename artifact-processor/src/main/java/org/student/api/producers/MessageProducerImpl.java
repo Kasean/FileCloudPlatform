@@ -4,7 +4,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.student.messaging.models.BaseArtifactMessage;
+import org.student.messaging.models.apmessages.BaseArtifactMessage;
 import org.student.messaging.models.serializers.JsonSerializer;
 
 import java.util.Properties;

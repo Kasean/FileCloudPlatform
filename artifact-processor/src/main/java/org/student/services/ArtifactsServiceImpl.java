@@ -5,10 +5,9 @@ import org.student.api.managers.KafkaSendFacadeImpl;
 import org.student.archiver.ArchiverService;
 import org.student.archiver.ArchiverServiceImpl;
 import org.student.configs.ApplicationConfig;
-import org.student.api.producers.MessageProducer;
-import org.student.messaging.models.BaseArtifactMessage;
-import org.student.messaging.models.BodyArtifactMessage;
-import org.student.messaging.models.ResponseCode;
+import org.student.messaging.models.apmessages.BaseArtifactMessage;
+import org.student.messaging.models.apmessages.BodyArtifactMessage;
+import org.student.messaging.models.apmessages.ResponseCode;
 import org.student.repositories.ArtifactsIMStorage;
 import org.student.repositories.ArtifactsRepository;
 

@@ -1,4 +1,4 @@
-package org.student.messaging.models;
+package org.student.messaging.models.apmessages;
 
 import java.util.UUID;
 
