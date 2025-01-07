@@ -8,6 +8,12 @@ public class ArtifactMetadataUploadRequest {
     private UUID artefactId;
     private Long artefactSize;
 
+    public ArtifactMetadataUploadRequest(UUID artefactId, String artefactName, Long artefactSize) {
+        this.artefactName = artefactName;
+        this.artefactId = artefactId;
+        this.artefactSize = artefactSize;
+    }
+
     public String getArtefactName() {
         return artefactName;
     }

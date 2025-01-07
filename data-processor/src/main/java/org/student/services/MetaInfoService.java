@@ -1,6 +1,6 @@
 package org.student.services;
 
-import org.student.dto.MetaInfoDto;
+import org.student.dto.MetaInfoWIthExternalIdDto;
 import org.student.messaging.models.ArtifactMetadataUploadRequest;
 
 import java.util.Optional;
@@ -10,7 +10,7 @@ public interface MetaInfoService {
 
     UUID saveMetaInfo(ArtifactMetadataUploadRequest request);
 
-    Optional<MetaInfoDto> readMetaInfo(UUID key);
+    Optional<MetaInfoWIthExternalIdDto> readMetaInfo(UUID key);
 
-    MetaInfoDto deleteMetaInfo(UUID key);
+    boolean deleteMetaInfo(UUID key);
 }

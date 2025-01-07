@@ -1,6 +1,7 @@
 package org.student.repositories;
 
-import org.student.dto.MetaInfoDto;
+import org.student.dto.MetaInfoWIthExternalIdDto;
+import org.student.dto.MetaInfoWithInternalIdDto;
 
 import java.util.Map;
 import java.util.Optional;
@@ -9,22 +10,27 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MetaInfoStorage implements MetaInfoRepository{
 
-    private final Map<UUID, MetaInfoDto> internalStorage = new ConcurrentHashMap<>();
+    private final Map<UUID, MetaInfoWithInternalIdDto> internalStorage = new ConcurrentHashMap<>();
 
     @Override
-    public UUID save(UUID artefactId, String artefactName, long artefactSize) {
-        internalStorage.put(artefactId, new MetaInfoDto(artefactName, artefactSize));
-        return artefactId;
+    public UUID save(MetaInfoWithInternalIdDto metaInfoWithInternalIdDto) {
+        UUID externalId = UUID.randomUUID();
+        internalStorage.put(externalId, metaInfoWithInternalIdDto);
+        return externalId;
     }
 
     @Override
-    public Optional<MetaInfoDto> findByKey(UUID key) {
-        var result = internalStorage.get(key);
-        return result == null ? Optional.empty() : Optional.of(result);
+    public Optional<MetaInfoWIthExternalIdDto> findByKey(UUID externalId) {
+        var result = internalStorage.get(externalId);
+        return result == null ? Optional.empty() :
+                Optional.of(new MetaInfoWIthExternalIdDto(
+                        externalId,
+                        result.artifactName(),
+                        result.artifactSize()));
     }
 
     @Override
-    public MetaInfoDto deleteByKey(UUID key) {
-        return internalStorage.remove(key);
+    public boolean deleteByKey(UUID key) {
+        return internalStorage.remove(key)!=null;
     }
 }
