@@ -3,10 +3,10 @@ package services;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
-import org.student.dto.MetaInfoWIthExternalIdDto;
-import org.student.dto.MetaInfoWithInternalIdDto;
+import org.student.dto.ExternalMetaInfoDto;
+import org.student.dto.InternalMetaInfoDto;
 import org.student.messaging.models.ArtifactMetadataUploadRequest;
 import org.student.repositories.MetaInfoStorage;
 import org.student.services.MetaInfoServiceImpl;
@@ -34,7 +34,7 @@ class MetaInfoServiceTest {
         ArtifactMetadataUploadRequest request =
                 new ArtifactMetadataUploadRequest(UUID.randomUUID(), "Artefact Name", 12345L);
 
-        when(storage.save(any(MetaInfoWithInternalIdDto.class))).thenReturn(UUID.randomUUID());
+        when(storage.save(any(InternalMetaInfoDto.class))).thenReturn(UUID.randomUUID());
 
         UUID result = metaInfoService.saveMetaInfo(request);
 
@@ -43,35 +43,57 @@ class MetaInfoServiceTest {
     }
 
     @Test
-    void readMetaInfoTest() {
+    void readExternalMetaInfoTest() {
         UUID externalId = UUID.randomUUID();
-        MetaInfoWIthExternalIdDto mockDto = new MetaInfoWIthExternalIdDto(
+        ExternalMetaInfoDto mockDto = new ExternalMetaInfoDto(
                 externalId, "Artefact Name", 12345L);
 
-        when(storage.findByKey(externalId)).thenReturn(Optional.of(mockDto));
+        when(storage.getExternalMetaInfo(externalId)).thenReturn(Optional.of(mockDto));
 
-        Optional<MetaInfoWIthExternalIdDto> result = metaInfoService.readMetaInfo(externalId);
+        Optional<ExternalMetaInfoDto> result = metaInfoService.readExternalMetaInfo(externalId);
 
         assertTrue(result.isPresent());
         assertEquals(mockDto, result.get());
     }
 
     @Test
-    void readMetaInfoNotFoundTest() {
+    void readExternalMetaInfoNotFoundTest() {
         UUID externalId = UUID.randomUUID();
 
-        when(storage.findByKey(externalId)).thenReturn(Optional.empty());
+        when(storage.getExternalMetaInfo(externalId)).thenReturn(Optional.empty());
 
-        Optional<MetaInfoWIthExternalIdDto> result = metaInfoService.readMetaInfo(externalId);
+        Optional<ExternalMetaInfoDto> result = metaInfoService.readExternalMetaInfo(externalId);
+
+        assertFalse(result.isPresent());
+    }
+
+    @Test
+    void readInternalMetaInfoDtoTest() {
+        UUID externalId = UUID.randomUUID();
+        InternalMetaInfoDto mockDto = new InternalMetaInfoDto(
+                UUID.randomUUID(), "Artefact Name", 12345L);
+
+        when(storage.getInternalMetaInfoDto(externalId)).thenReturn(Optional.of(mockDto));
+
+        Optional<InternalMetaInfoDto> result = metaInfoService.readInternalMetaInfoDto(externalId);
+
+        assertTrue(result.isPresent());
+        assertEquals(mockDto.internalId(), result.get().internalId());
+    }
+
+    @Test
+    void readInternalMetaInfoDtoNotFoundTest() {
+        UUID externalId = UUID.randomUUID();
+
+        when(storage.getInternalMetaInfoDto(externalId)).thenReturn(Optional.empty());
+
+        Optional<InternalMetaInfoDto> result = metaInfoService.readInternalMetaInfoDto(externalId);
 
         assertFalse(result.isPresent());
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "true",
-            "false"
-    })
+    @ValueSource(booleans = {true, false})
     void deleteMetaInfoTest(boolean expectedResult) {
         UUID key = UUID.randomUUID();
         when(storage.deleteByKey(key)).thenReturn(expectedResult);

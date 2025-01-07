@@ -1,15 +1,18 @@
 package org.student.repositories;
 
-import org.student.dto.MetaInfoWIthExternalIdDto;
-import org.student.dto.MetaInfoWithInternalIdDto;
+import org.student.dto.ExternalMetaInfoDto;
+import org.student.dto.InternalMetaInfoDto;
 
 import java.util.Optional;
 import java.util.UUID;
 
 public interface MetaInfoRepository {
-    UUID save(MetaInfoWithInternalIdDto metaInfoWithInternalIdDto);
+    UUID save(InternalMetaInfoDto internalMetaInfoDto);
 
-    Optional<MetaInfoWIthExternalIdDto> findByKey(UUID key);
+    Optional<ExternalMetaInfoDto> getExternalMetaInfo(UUID externalId);
+
+    Optional<InternalMetaInfoDto> getInternalMetaInfoDto(UUID externalId);
+
 
     boolean deleteByKey(UUID key);
 }

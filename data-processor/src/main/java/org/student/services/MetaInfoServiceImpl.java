@@ -1,9 +1,10 @@
 package org.student.services;
 
-import org.student.dto.MetaInfoWIthExternalIdDto;
-import org.student.dto.MetaInfoWithInternalIdDto;
+import org.student.dto.ExternalMetaInfoDto;
+import org.student.dto.InternalMetaInfoDto;
 import org.student.messaging.models.ArtifactMetadataUploadRequest;
 import org.student.repositories.MetaInfoStorage;
+import org.student.utility.MetaInfoMapper;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -19,15 +20,17 @@ public class MetaInfoServiceImpl implements MetaInfoService{
     @Override
     public UUID saveMetaInfo(ArtifactMetadataUploadRequest request) {
         return storage.save(
-                new MetaInfoWithInternalIdDto(
-                        request.getArtefactId(),
-                        request.getArtefactName(),
-                        request.getArtefactSize()));
+                MetaInfoMapper.toInternalMetaInfoDto(request));
     }
 
     @Override
-    public Optional<MetaInfoWIthExternalIdDto> readMetaInfo(UUID externalId) {
-        return storage.findByKey(externalId);
+    public Optional<ExternalMetaInfoDto> readExternalMetaInfo(UUID externalId) {
+        return storage.getExternalMetaInfo(externalId);
+    }
+
+    @Override
+    public Optional<InternalMetaInfoDto> readInternalMetaInfoDto(UUID externalId) {
+        return storage.getInternalMetaInfoDto(externalId);
     }
 
     @Override
