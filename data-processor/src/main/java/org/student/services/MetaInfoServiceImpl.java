@@ -24,13 +24,13 @@ public class MetaInfoServiceImpl implements MetaInfoService{
     }
 
     @Override
-    public Optional<ExternalMetaInfoDto> readExternalMetaInfo(UUID externalId) {
-        return storage.getExternalMetaInfo(externalId);
+    public Optional<ExternalMetaInfoDto> readExternalMetaInfo(UUID id) {
+        return storage.getExternalMetaInfo(id);
     }
 
     @Override
-    public Optional<InternalMetaInfoDto> readInternalMetaInfoDto(UUID externalId) {
-        return storage.getInternalMetaInfoDto(externalId);
+    public Optional<InternalMetaInfoDto> readInternalMetaInfoDto(UUID id) {
+        return storage.getInternalMetaInfoDto(id);
     }
 
     @Override

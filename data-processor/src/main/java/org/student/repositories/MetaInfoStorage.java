@@ -20,17 +20,31 @@ public class MetaInfoStorage implements MetaInfoRepository{
         return externalId;
     }
 
+    /**
+     * Reads artifact metadata and returns a DTO with data and external id.
+     *
+     * @param id external metadata identifier.
+     * @return {@link Optional} containing {@link ExternalMetaInfoDto} if found,
+     * or an empty {@link Optional} if no metadata is associated with this identifier
+     */
     @Override
-    public Optional<ExternalMetaInfoDto> getExternalMetaInfo(UUID externalId) {
-        var result = internalStorage.get(externalId);
+    public Optional<ExternalMetaInfoDto> getExternalMetaInfo(UUID id) {
+        var result = internalStorage.get(id);
         return result == null ? Optional.empty() :
                 Optional.of(
-                        MetaInfoMapper.toExternalMetaInfoDto(result,externalId));
+                        MetaInfoMapper.toExternalMetaInfoDto(result,id));
     }
 
+    /**
+     * Reads artifact metadata and returns a DTO with data and internal id.
+     *
+     * @param id external metadata identifier.
+     * @return {@link Optional} containing {@link InternalMetaInfoDto} if found,
+     * or an empty {@link Optional} if no metadata is associated with this identifier
+     */
     @Override
-    public Optional<InternalMetaInfoDto> getInternalMetaInfoDto(UUID externalId) {
-        var result = internalStorage.get(externalId);
+    public Optional<InternalMetaInfoDto> getInternalMetaInfoDto(UUID id) {
+        var result = internalStorage.get(id);
         return result == null ? Optional.empty() :
                 Optional.of(result);
     }
