@@ -1,4 +1,4 @@
-rootProject.name = "FileGarbage"
+rootProject.name = "FileСloudPlatform"
 include 'core-back-end'
 include 'artifact-processor'
 include 'data-processor'
