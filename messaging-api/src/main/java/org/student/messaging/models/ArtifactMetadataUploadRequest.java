@@ -14,6 +14,8 @@ public class ArtifactMetadataUploadRequest {
         this.artefactSize = artefactSize;
     }
 
+    public ArtifactMetadataUploadRequest(){}
+
     public String getArtefactName() {
         return artefactName;
     }

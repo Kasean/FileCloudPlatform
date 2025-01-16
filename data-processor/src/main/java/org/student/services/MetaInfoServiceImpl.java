@@ -1,5 +1,6 @@
 package org.student.services;
 
+import org.springframework.stereotype.Service;
 import org.student.dto.ExternalMetaInfoDto;
 import org.student.dto.InternalMetaInfoDto;
 import org.student.messaging.models.ArtifactMetadataUploadRequest;
@@ -9,6 +10,7 @@ import org.student.utility.MetaInfoMapper;
 import java.util.Optional;
 import java.util.UUID;
 
+@Service
 public class MetaInfoServiceImpl implements MetaInfoService{
 
     private final MetaInfoStorage storage;

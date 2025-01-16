@@ -1,5 +1,6 @@
 package org.student.repositories;
 
+import org.springframework.stereotype.Repository;
 import org.student.dto.ExternalMetaInfoDto;
 import org.student.dto.InternalMetaInfoDto;
 import org.student.utility.MetaInfoMapper;
@@ -9,6 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Repository
 public class MetaInfoStorage implements MetaInfoRepository{
 
     private final Map<UUID, InternalMetaInfoDto> internalStorage = new ConcurrentHashMap<>();
