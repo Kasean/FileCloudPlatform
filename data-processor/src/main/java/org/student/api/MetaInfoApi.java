@@ -12,9 +12,9 @@ import java.util.UUID;
 public interface MetaInfoApi {
     UUID save(ArtifactMetadataUploadRequest request) throws SaveDataException;
 
-    Optional<ExternalMetaInfoDto> getExternalMeta(UUID id) throws DataNotFoundException;
+    ExternalMetaInfoDto getExternalMeta(UUID id) throws DataNotFoundException;
 
-    Optional<InternalMetaInfoDto> getInternalMeta(UUID id) throws DataNotFoundException;
+    InternalMetaInfoDto getInternalMeta(UUID id) throws DataNotFoundException;
 
 
     boolean delete(UUID id);

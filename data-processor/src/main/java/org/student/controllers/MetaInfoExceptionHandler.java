@@ -11,13 +11,13 @@ import org.student.exceptions.SaveDataException;
 public class MetaInfoExceptionHandler {
 
     @ExceptionHandler(DataNotFoundException.class)
-    public ResponseEntity<String> handleDataNotFoundException() {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No content was found for the corresponding key");
+    public ResponseEntity<String> handleDataNotFoundException(DataNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     @ExceptionHandler(SaveDataException.class)
-    public ResponseEntity<String> handleSaveDataException() {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred during saving, check your request");
+    public ResponseEntity<String> handleSaveDataException(SaveDataException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
