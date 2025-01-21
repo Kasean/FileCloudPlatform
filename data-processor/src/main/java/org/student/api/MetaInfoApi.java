@@ -6,7 +6,6 @@ import org.student.exceptions.DataNotFoundException;
 import org.student.exceptions.SaveDataException;
 import org.student.messaging.models.ArtifactMetadataUploadRequest;
 
-import java.util.Optional;
 import java.util.UUID;
 
 public interface MetaInfoApi {

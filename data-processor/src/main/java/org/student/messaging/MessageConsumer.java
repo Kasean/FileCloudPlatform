@@ -22,7 +22,7 @@ public class MessageConsumer implements MetaInfoApi {
 
     private final MetaInfoServiceImpl metaInfoService;
 
-    private static final Logger logger = LogManager.getLogger(MessageConsumer.class);
+    private static final Logger logger = LogManager.getLogger("MessageConsumer");
 
     public MessageConsumer(MetaInfoServiceImpl metaInfoService) {
         this.metaInfoService = metaInfoService;

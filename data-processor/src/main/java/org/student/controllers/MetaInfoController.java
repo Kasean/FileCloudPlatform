@@ -16,7 +16,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/meta-info")
 public class MetaInfoController implements MetaInfoApi {
-    private static final Logger logger = LogManager.getLogger(MetaInfoController.class);
+    private static final Logger logger = LogManager.getLogger("MetaInfoController");
 
     private final MetaInfoServiceImpl metaInfoService;
 
@@ -29,7 +29,7 @@ public class MetaInfoController implements MetaInfoApi {
     public InternalMetaInfoDto getInternalMeta(@PathVariable UUID id) throws DataNotFoundException {
         logger.info("A GET request to get internal meta-info was received");
         return metaInfoService.readInternalMetaInfoDto(id)
-                .orElseThrow(()->{
+                .orElseThrow(() -> {
                     logger.error("No internal metadata found for ID: {}", id);
                     return new DataNotFoundException("Error getting internal meta-information by id");
                 });
@@ -40,7 +40,7 @@ public class MetaInfoController implements MetaInfoApi {
     public ExternalMetaInfoDto getExternalMeta(@PathVariable UUID id) throws DataNotFoundException {
         logger.info("A GET request to get external meta-info was received");
         return metaInfoService.readExternalMetaInfo(id)
-                .orElseThrow(()->{
+                .orElseThrow(() -> {
                     logger.error("No external metadata found for ID: {}", id);
                     return new DataNotFoundException("Error getting external meta-information by id");
                 });

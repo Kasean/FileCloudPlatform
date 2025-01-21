@@ -20,6 +20,15 @@ public class ArtifactMetadataUploadRequest {
         return artefactName;
     }
 
+    @Override
+    public String toString() {
+        return "ArtifactMetadataUploadRequest{" +
+                "artefactName='" + artefactName + '\'' +
+                ", artefactId=" + artefactId +
+                ", artefactSize=" + artefactSize +
+                '}';
+    }
+
     public void setArtefactName(String artefactName) {
         this.artefactName = artefactName;
     }

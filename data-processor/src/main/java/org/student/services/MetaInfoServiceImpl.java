@@ -15,7 +15,7 @@ import java.util.UUID;
 @Service
 public class MetaInfoServiceImpl implements MetaInfoService{
 
-    private static final Logger logger = LogManager.getLogger(MetaInfoServiceImpl.class);
+    private static final Logger logger = LogManager.getLogger("MetaInfoServiceImpl");
     private final MetaInfoStorage storage;
 
     public MetaInfoServiceImpl(MetaInfoStorage storage) { //Added a class constructor for easier writing of tests

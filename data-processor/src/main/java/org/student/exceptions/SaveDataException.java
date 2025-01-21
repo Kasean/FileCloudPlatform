@@ -5,6 +5,4 @@ public class SaveDataException extends Exception{
         super(message);
     }
 
-    public SaveDataException() {
-    }
 }
