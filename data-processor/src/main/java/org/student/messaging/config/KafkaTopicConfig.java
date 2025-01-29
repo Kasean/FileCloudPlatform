@@ -36,7 +36,6 @@ public class KafkaTopicConfig {
         return TopicBuilder.name("save-info-topic")
                 .partitions(topicProperties.getPartitionCount())
                 .replicas(topicProperties.getReplicaCount())
-                .compact()
                 .build();
     }
 
@@ -45,7 +44,6 @@ public class KafkaTopicConfig {
         return TopicBuilder.name("get-ext-info-topic")
                 .partitions(topicProperties.getPartitionCount())
                 .replicas(topicProperties.getReplicaCount())
-                .compact()
                 .build();
     }
 
@@ -54,7 +52,6 @@ public class KafkaTopicConfig {
         return TopicBuilder.name("get-int-info-topic")
                 .partitions(topicProperties.getPartitionCount())
                 .replicas(topicProperties.getReplicaCount())
-                .compact()
                 .build();
     }
 
@@ -63,7 +60,6 @@ public class KafkaTopicConfig {
         return TopicBuilder.name("del-info-topic")
                 .partitions(topicProperties.getPartitionCount())
                 .replicas(topicProperties.getReplicaCount())
-                .compact()
                 .build();
     }
 
@@ -72,7 +68,6 @@ public class KafkaTopicConfig {
         return TopicBuilder.name("save-response-topic")
                 .partitions(topicProperties.getPartitionCount())
                 .replicas(topicProperties.getReplicaCount())
-                .compact()
                 .build();
     }
 
@@ -81,7 +76,6 @@ public class KafkaTopicConfig {
         return TopicBuilder.name("del-response-topic")
                 .partitions(topicProperties.getPartitionCount())
                 .replicas(topicProperties.getReplicaCount())
-                .compact()
                 .build();
     }
 
@@ -90,7 +84,6 @@ public class KafkaTopicConfig {
         return TopicBuilder.name("get-ext-response-topic")
                 .partitions(topicProperties.getPartitionCount())
                 .replicas(topicProperties.getReplicaCount())
-                .compact()
                 .build();
     }
 
@@ -99,7 +92,6 @@ public class KafkaTopicConfig {
         return TopicBuilder.name("get-int-response-topic")
                 .partitions(topicProperties.getPartitionCount())
                 .replicas(topicProperties.getReplicaCount())
-                .compact()
                 .build();
     }
 }
