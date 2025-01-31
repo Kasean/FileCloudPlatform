@@ -14,8 +14,19 @@ public class ArtifactMetadataUploadRequest {
         this.artefactSize = artefactSize;
     }
 
+    public ArtifactMetadataUploadRequest(){}
+
     public String getArtefactName() {
         return artefactName;
+    }
+
+    @Override
+    public String toString() {
+        return "ArtifactMetadataUploadRequest{" +
+                "artefactName='" + artefactName + '\'' +
+                ", artefactId=" + artefactId +
+                ", artefactSize=" + artefactSize +
+                '}';
     }
 
     public void setArtefactName(String artefactName) {
