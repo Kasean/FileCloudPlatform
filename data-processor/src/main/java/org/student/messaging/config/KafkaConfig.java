@@ -10,7 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
+import org.springframework.kafka.listener.RecordInterceptor;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.student.messaging.MessageKeyHolder;
 import org.student.messaging.config.properties.KafkaProperties;
 
 import java.util.HashMap;
@@ -76,13 +78,23 @@ public class KafkaConfig {
         ConcurrentKafkaListenerContainerFactory<String, byte[]> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
+        factory.setRecordInterceptor(recordInterceptor());
         return factory;
     }
 
     @Bean
+    public RecordInterceptor<String,byte[]> recordInterceptor() {
+        return (record,consumer) -> {
+            MessageKeyHolder.set(record.key());
+            return record;
+        };
+    }
+
+        @Bean
     public KafkaTemplate<String, byte[]> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
+
 
 }
 

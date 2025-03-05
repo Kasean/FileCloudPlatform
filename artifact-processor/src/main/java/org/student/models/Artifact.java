@@ -1,5 +1,7 @@
 package org.student.models;
 
+import java.util.Arrays;
+
 public class Artifact {
 
     private final ArtifactMetaInfo metaInfo = new ArtifactMetaInfo();
@@ -23,5 +25,13 @@ public class Artifact {
 
     public void setArtifactData(byte[] artifactData) {
         this.artifactData = artifactData;
+    }
+
+    @Override
+    public String toString() {
+        return "Artifact{" +
+                "metaInfo=" + metaInfo +
+                ", artifactData=" + Arrays.toString(artifactData) +
+                '}';
     }
 }

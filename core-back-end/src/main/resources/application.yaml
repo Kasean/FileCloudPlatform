@@ -1,11 +1,8 @@
 spring:
   kafka:
     bootstrap-servers: localhost:9092
-    consumer:
-      group-id: core-file-garbage-group
-      auto-offset-reset: earlier
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+    topic:
+      partitionCount: 2
+      replicaCount: 1
+  main:
+    banner-mode: off

@@ -1,4 +1,4 @@
-package org.student.api;
+package org.student.api.controller;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +16,7 @@ import org.student.api.models.ArtifactCreateRequest;
 import org.student.api.models.ArtifactLoadResponse;
 import org.student.api.models.ArtifactMateInfo;
 import org.student.api.models.ArtifactResponse;
+import org.student.exceptions.messaging.UploadDataException;
 import org.student.services.ArtifactsService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -35,7 +36,7 @@ class FilesControllerTest {
 
     @Test
     @WithMockUser(username = "user")
-    void testArtifactUploading() {
+    void testArtifactUploading() throws UploadDataException {
 
         var testBody = new byte[0];
         var testName = "Test name";

@@ -1,0 +1,11 @@
+key-store:
+  rootPassword: P@55w0rd
+  pathToKeyStore: artifact-processor/src/main/resources
+  defaultRSAAlias: RSAKey
+
+spring:
+  kafka:
+    bootstrapServers: localhost:9092
+    topic:
+      partitionCount: 2
+      replicaCount: 1

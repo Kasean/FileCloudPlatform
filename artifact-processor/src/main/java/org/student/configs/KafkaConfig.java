@@ -1,60 +1,61 @@
 package org.student.configs;
 
-import java.util.Set;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.ByteArrayDeserializer;
+import org.apache.kafka.common.serialization.ByteArraySerializer;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.core.*;
+import org.student.configs.properties.KafkaProperties;
+import org.student.configs.properties.KeyStoreProperties;
 
+import java.util.HashMap;
+import java.util.Map;
+
+@Configuration
+@EnableConfigurationProperties({KeyStoreProperties.class, KafkaProperties.class})
 public class KafkaConfig {
-    private String bootstrapServers;
-    private String groupId;
-    private Set<String> topicsForCreate;
-    private Set<String> topicsForRead;
-    private Set<String> topicsForUpdate;
-    private Set<String> topicsForDelete;
+    private final KafkaProperties kafkaProperties;
 
-    public String getBootstrapServers() {
-        return bootstrapServers;
+    public KafkaConfig(KafkaProperties kafkaProperties) {
+        this.kafkaProperties = kafkaProperties;
     }
 
-    public void setBootstrapServers(String bootstrapServers) {
-        this.bootstrapServers = bootstrapServers;
+    @Bean
+    public ProducerFactory<String,byte[]> producerFactory(){
+        Map<String,Object> props = new HashMap<>();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,kafkaProperties.getBootstrapServers());
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class);
+        return new DefaultKafkaProducerFactory<>(props);
     }
 
-    public String getGroupId() {
-        return groupId;
+    @Bean
+    public ConsumerFactory<String,byte[]> consumerFactory(){
+        Map<String,Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "artifact-processor-group");
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,"earliest");
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class);
+        return new DefaultKafkaConsumerFactory<>(props);
     }
 
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, byte[]> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, byte[]> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactory());
+        return factory;
     }
 
-    public Set<String> getTopicsForCreate() {
-        return topicsForCreate;
-    }
-
-    public void setTopicsForCreate(Set<String> topicsForCreate) {
-        this.topicsForCreate = topicsForCreate;
-    }
-
-    public Set<String> getTopicsForRead() {
-        return topicsForRead;
-    }
-
-    public void setTopicsForRead(Set<String> topicsForRead) {
-        this.topicsForRead = topicsForRead;
-    }
-
-    public Set<String> getTopicsForUpdate() {
-        return topicsForUpdate;
-    }
-
-    public void setTopicsForUpdate(Set<String> topicsForUpdate) {
-        this.topicsForUpdate = topicsForUpdate;
-    }
-
-    public Set<String> getTopicsForDelete() {
-        return topicsForDelete;
-    }
-
-    public void setTopicsForDelete(Set<String> topicsForDelete) {
-        this.topicsForDelete = topicsForDelete;
+    @Bean
+    public KafkaTemplate<String,byte[]> kafkaTemplate(){
+        return new KafkaTemplate<>(producerFactory());
     }
 }

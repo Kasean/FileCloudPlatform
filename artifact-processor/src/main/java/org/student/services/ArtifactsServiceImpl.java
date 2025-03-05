@@ -1,11 +1,10 @@
 package org.student.services;
 
-import org.student.api.managers.KafkaSendFacade;
-import org.student.api.managers.KafkaSendFacadeImpl;
+import org.springframework.stereotype.Service;
+import org.student.api.producers.MessageProducer;
 import org.student.archiver.ArchiverService;
 import org.student.archiver.ArchiverServiceImpl;
-import org.student.configs.ApplicationConfig;
-import org.student.api.producers.MessageProducer;
+import org.student.configs.properties.KeyStoreProperties;
 import org.student.messaging.models.BaseArtifactMessage;
 import org.student.messaging.models.BodyArtifactMessage;
 import org.student.messaging.models.ResponseCode;
@@ -14,16 +13,17 @@ import org.student.repositories.ArtifactsRepository;
 
 import java.util.UUID;
 
+@Service
 public class ArtifactsServiceImpl implements ArtifactsService {
 
+    private final MessageProducer<BaseArtifactMessage> producer;
     private final ArchiverService archiver;
     private final ArtifactsRepository repository = new ArtifactsIMStorage(); // TODO: add choice in config: real db or in memory storage
 
-    private final KafkaSendFacade producer;
 
-    public ArtifactsServiceImpl(ApplicationConfig config) {
-        this.archiver = new ArchiverServiceImpl(config.getKeyStore());
-        this.producer = new KafkaSendFacadeImpl(config.getKafka().getBootstrapServers());
+    public ArtifactsServiceImpl(MessageProducer<BaseArtifactMessage> messageProducer, KeyStoreProperties keyStoreProperties) {
+        this.producer = messageProducer;
+        this.archiver = new ArchiverServiceImpl(keyStoreProperties.getRootPassword().toCharArray(), keyStoreProperties.getPathToKeyStore(), keyStoreProperties.getDefaultRSAAlias());
     }
 
     @Override
@@ -36,7 +36,8 @@ public class ArtifactsServiceImpl implements ArtifactsService {
         artifactResponse.setResponseCode(ResponseCode.CREATED);
         artifactResponse.setInternalId(id);
 
-        producer.send(topic, key, BaseArtifactMessage.class, artifactResponse);
+
+        producer.send(key, topic, artifactResponse);
     }
 
     @Override
@@ -50,7 +51,7 @@ public class ArtifactsServiceImpl implements ArtifactsService {
         artifactResponse.setResponseCode(ResponseCode.READED);
         artifactResponse.setInternalId(id);
 
-        producer.send(topic, key, BodyArtifactMessage.class, artifactResponse);
+        producer.send(key, topic, artifactResponse);
     }
 
     @Override
@@ -69,7 +70,7 @@ public class ArtifactsServiceImpl implements ArtifactsService {
         artifactResponse.setResponseCode(ResponseCode.DELETED);
         artifactResponse.setInternalId(id);
 
-        producer.send(topic, key, BodyArtifactMessage.class, artifactResponse);
+        producer.send(key, topic, artifactResponse);
     }
 
     @Override

@@ -17,6 +17,7 @@ public class KafkaTopics {
         public static final String DEL_RESPONSE_TOPIC = "del-response-topic";
         public static final String GET_EXT_INFO_RESPONSE_TOPIC = "get-ext-response-topic";
         public static final String GET_INT_INFO_RESPONSE_TOPIC = "get-int-response-topic";
+        public static final String ERROR_RESPONSE_TOPIC = "error-response-topic";
     }
 
 

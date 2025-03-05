@@ -1,6 +1,9 @@
-package org.student.configs;
+package org.student.configs.properties;
 
-public class KeyStoreConfig {
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@ConfigurationProperties(prefix = "key-store")
+public class KeyStoreProperties {
 
     private String rootPassword;
 
