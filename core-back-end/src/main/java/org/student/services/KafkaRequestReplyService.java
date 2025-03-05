@@ -50,6 +50,7 @@ public class KafkaRequestReplyService {
             "tpc1",
             KafkaTopics.ResponseMeta.SAVE_RESPONSE_TOPIC,
             KafkaTopics.ResponseMeta.GET_INT_INFO_RESPONSE_TOPIC,
+            KafkaTopics.ResponseMeta.DEL_RESPONSE_TOPIC,
             KafkaTopics.ResponseMeta.ERROR_RESPONSE_TOPIC,
             "tpd1",
             "tpr1"

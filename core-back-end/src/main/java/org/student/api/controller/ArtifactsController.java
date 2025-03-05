@@ -1,9 +1,6 @@
 package org.student.api.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 import org.student.api.models.ArtifactCreateRequest;
 import org.student.api.models.ArtifactLoadResponse;
 import org.student.api.models.ArtifactResponse;
@@ -21,4 +18,7 @@ public interface ArtifactsController {
 
     @GetMapping("/loadArtifact/{id}")
     Mono<ArtifactLoadResponse> loadArtifact(@PathVariable UUID id);
+
+    @DeleteMapping("/deleteArtifact/{id}")
+    Mono<ArtifactResponse> deleteArtifact(@PathVariable UUID id);
 }
