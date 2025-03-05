@@ -36,7 +36,7 @@ class FilesControllerTest {
 
     @Test
     @WithMockUser(username = "user")
-    void testArtifactUploading() throws UploadDataException {
+    void testArtifactUploading(){
 
         var testBody = new byte[0];
         var testName = "Test name";

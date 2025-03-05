@@ -1,11 +1,9 @@
 package org.student.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.stereotype.Service;
 import org.student.api.models.ArtifactCreateRequest;
 import org.student.api.models.ArtifactLoadResponse;
 import org.student.api.models.ArtifactResponse;
-import org.student.exceptions.messaging.UploadDataException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

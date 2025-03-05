@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.student.archiver.ArchiverService;
 import org.student.archiver.ArchiverServiceImpl;
-import org.student.configs.properties.KeyStoreProperties;
 import org.student.models.Artifact;
 
 import java.io.IOException;

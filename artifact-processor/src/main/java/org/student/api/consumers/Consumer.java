@@ -6,12 +6,9 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
-import org.student.messaging.models.BaseArtifactMessage;
-import org.student.messaging.topics.KafkaTopics;
 import org.student.services.ArtifactsServiceImpl;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.UUID;
 
 @Service
