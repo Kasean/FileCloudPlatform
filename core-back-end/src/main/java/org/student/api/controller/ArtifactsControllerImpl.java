@@ -28,7 +28,6 @@ public class ArtifactsControllerImpl implements ArtifactsController {
     }
 
     @Override
-    @PostMapping("/upload")
     public Mono<ArtifactResponse> uploadArtifact(@RequestBody ArtifactCreateRequest request) {
         logger.info("Creating artifact from request: {}", request);
         return artifactsService.upload(request)
@@ -40,14 +39,12 @@ public class ArtifactsControllerImpl implements ArtifactsController {
     }
 
     @Override
-    @GetMapping("/getAll")
     public Flux<ArtifactResponse> getAllArtifacts() {
         return artifactsService.getAllArtifacts()
                 .doOnNext(artifact -> logger.info("Received artifact info from storage: {}", artifact));
     }
 
     @Override
-    @GetMapping("/loadArtifact/{id}")
     public Mono<ArtifactLoadResponse> loadArtifact(@PathVariable UUID id) {
         return artifactsService.getArtifactById(id)
                 .doOnNext(artifact -> logger.info("Loading artifact with id {}", id))
@@ -55,6 +52,11 @@ public class ArtifactsControllerImpl implements ArtifactsController {
                     logger.error("load failed: {}", e.getMessage());
                     return Mono.error(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
                 });
+    }
+
+    @Override
+    public Mono<ArtifactResponse> deleteArtifact(UUID id) {
+        return artifactsService.deleteArtifact(id).doOnNext(artifactResponse -> logger.info("Artifact {} deleted", artifactResponse));
     }
 
     @Override
