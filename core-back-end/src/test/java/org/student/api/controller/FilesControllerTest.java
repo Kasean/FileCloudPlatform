@@ -1,7 +1,6 @@
 package org.student.api.controller;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -9,14 +8,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.student.CoreApplication;
 import org.student.api.models.ArtifactCreateRequest;
 import org.student.api.models.ArtifactLoadResponse;
 import org.student.api.models.ArtifactMateInfo;
 import org.student.api.models.ArtifactResponse;
-import org.student.exceptions.messaging.UploadDataException;
 import org.student.services.ArtifactsService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -24,8 +23,8 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.UUID;
 
-@ExtendWith(SpringExtension.class)
 @WebFluxTest(ArtifactsControllerImpl.class)
+@ContextConfiguration(classes = CoreApplication.class)
 class FilesControllerTest {
 
     @Autowired
