@@ -57,4 +57,9 @@ public class ArtifactsControllerImpl implements ArtifactsController {
                 });
     }
 
+    @Override
+    public Mono<ArtifactResponse> deleteArtifact(UUID id) {
+        return artifactsService.deleteArtifact(id).doOnNext(artifactResponse -> logger.info("Artifact {} deleted", artifactResponse));
+    }
+
 }

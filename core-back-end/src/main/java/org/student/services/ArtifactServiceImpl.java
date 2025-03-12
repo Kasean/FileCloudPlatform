@@ -113,4 +113,36 @@ public class ArtifactServiceImpl implements ArtifactsService{
         }
         return Mono.error(()-> new IllegalArgumentException("There was an error, check id"));
     }
+
+    @Override
+    public Mono<ArtifactResponse> deleteArtifact(UUID id) {
+        var internalMetaInfo = send(KafkaTopics.CrudMeta.GET_INT_META_INFO_TOPIC,id, InternalMetaInfoDto.class,Map.of("__TypeId__","uuid".getBytes(StandardCharsets.UTF_8)));
+        if (internalMetaInfo!=null){
+            boolean metaInfoDeleted = send(KafkaTopics.CrudMeta.DEL_META_INFO,id,Boolean.class,Map.of("__TypeId__","uuid".getBytes(StandardCharsets.UTF_8)));
+            if (metaInfoDeleted){
+                UUID internalArtifactId = internalMetaInfo.internalId();
+                String artifactName = internalMetaInfo.artifactName();
+                long artifactSize = internalMetaInfo.artifactSize();
+
+                var bodyArtifactMessage = send("tpd1",internalArtifactId, BodyArtifactMessage.class,null);
+                if (bodyArtifactMessage.getResponseCode().equals(ResponseCode.DELETED)){
+                    return Mono.just(new ArtifactResponse(id,new ArtifactMateInfo(artifactName, artifactSize)));
+                }else {
+                    rollBackDeletedMetaInfo(internalArtifactId,artifactName,artifactSize);
+                }
+            }
+        }
+        return Mono.error(()->new IllegalArgumentException("There was an error, check id"));
+    }
+
+    @Async
+    protected void rollBackDeletedMetaInfo(UUID internalId,String artefactName,long artefactSize){
+        send(KafkaTopics.CrudMeta.SAVE_META_INFO_TOPIC,
+                new ArtifactMetadataUploadRequest(internalId,artefactName,artefactSize),
+                UUID.class,
+                Map.of("__TypeId__","artifactMetadataUploadRequest".getBytes(StandardCharsets.UTF_8)));
+        logger.info("METAINFORMATION RECOVERED");
+    }
+
+
 }

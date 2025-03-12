@@ -39,3 +39,13 @@ The Data Processor module is responsible for handling artifact meta-information.
 
 - **External Identifier:** When saving data, the Data Processor generates an external identifier, which allows for information access.
 - **Internal Identifier:** The internal identifier, under which the artifact is registered in the system, remains hidden throughout the entire process. It can only be obtained using a special method.
+
+---
+
+## 3. Core Backend
+
+### Base Structure
+
+![Core Backend Structure](docs/pictures/CoreBackendStruct.png)
+
+Core Backend is the module that the user interacts with to add artifacts. It sends requests via Kafka to other modules and, after receiving the results, executes them.
