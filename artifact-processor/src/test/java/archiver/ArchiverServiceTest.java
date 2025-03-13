@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.student.archiver.ArchiverService;
 import org.student.archiver.ArchiverServiceImpl;
-import org.student.configs.KeyStoreConfig;
 import org.student.models.Artifact;
 
 import java.io.IOException;
@@ -24,13 +23,7 @@ class ArchiverServiceTest {
 
     @BeforeEach
     void setUp() {
-
-        KeyStoreConfig config = new KeyStoreConfig();
-        config.setDefaultRSAAlias(RSA_ALIAS);
-        config.setRootPassword(ROOT_PASSWORD);
-        config.setPathToKeyStore(PATH_TO_KEY_STORE);
-
-        archiverService = new ArchiverServiceImpl(config);
+        archiverService = new ArchiverServiceImpl(ROOT_PASSWORD.toCharArray(),PATH_TO_KEY_STORE,RSA_ALIAS);
     }
 
     @AfterEach

@@ -12,7 +12,6 @@ import java.util.UUID;
 @Service
 public interface ArtifactsService {
 
-
     Mono<ArtifactResponse> upload(ArtifactCreateRequest request);
 
     Flux<ArtifactResponse> getAllArtifacts();

@@ -6,7 +6,6 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.student.configs.KeyStoreConfig;
 import org.student.models.Artifact;
 import org.student.models.ArtifactMetaInfo;
 
@@ -16,7 +15,6 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -46,10 +44,10 @@ public class ArchiverServiceImpl implements ArchiverService {
     private final ArchiverRepository archiverRepository = new ArchiverIMStorage(); // TODO: add choice in config: real db or in memory storage
     private final String defaultRSAAlias;
 
-    public ArchiverServiceImpl(KeyStoreConfig config) {
-        this.rootPassword = config.getRootPassword().toCharArray();
-        this.pathToKeyStore = config.getPathToKeyStore();
-        this.defaultRSAAlias = config.getDefaultRSAAlias();
+    public ArchiverServiceImpl(char[] rootPassword, String pathToKeyStore, String defaultRSAAlias) {
+        this.rootPassword = rootPassword;
+        this.pathToKeyStore = pathToKeyStore;
+        this.defaultRSAAlias = defaultRSAAlias;
 
         this.keyStore = getInstance(rootPassword, pathToKeyStore);
     }
