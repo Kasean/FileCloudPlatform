@@ -25,7 +25,7 @@ public class Consumer {
         if (!"request".equalsIgnoreCase(messageType)){
             return;
         }
-        artifactsService.createArtifactMessage(record.key(), record.value(),record.topic());
+        artifactsService.createArtifactMessage(record.key(), record.value(), record.topic());
     }
 
     @KafkaListener(id="artifact-delete-listener",topicPartitions = @TopicPartition(topic = "tpd1", partitions = {"0","1"}),groupId = "delete-group-id")
