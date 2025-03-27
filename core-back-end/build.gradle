@@ -20,10 +20,10 @@ configurations {
 dependencies {
 
     implementation project(':messaging-api')
-    implementation project(':data-processor')
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
     //implementation 'org.springframework.boot:spring-boot-starter-security'
 //    implementation group: 'org.keycloak', name: 'keycloak-spring-boot-adapter', version: '23.0.3'
 //    implementation 'org.keycloak:keycloak-admin-client:23.0.3'
@@ -32,7 +32,6 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'io.projectreactor:reactor-test'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'io.micrometer:micrometer-registry-prometheus'
 
 
 }

@@ -37,7 +37,7 @@ public class ArtifactsControllerImpl implements ArtifactsController {
      * @return a Mono emitting the response with details of the created artifact
      */
     @Override
-    public Mono<ArtifactResponse> uploadArtifact(@RequestBody ArtifactCreateRequest request) {
+    public Mono<ArtifactResponse> uploadArtifact(ArtifactCreateRequest request) {
         logger.info("Creating artifact from request: {}", request);
         return artifactsService.upload(request)
                 .doOnNext(artifactResponse -> logger.info("Created artifact: {}", artifactResponse))
@@ -61,7 +61,7 @@ public class ArtifactsControllerImpl implements ArtifactsController {
      * @return a Mono emitting the details of the loaded artifact.
      */
     @Override
-    public Mono<ArtifactLoadResponse> loadArtifact(@PathVariable UUID id) {
+    public Mono<ArtifactLoadResponse> loadArtifact(UUID id) {
         return artifactsService.getArtifactById(id)
                 .doOnNext(artifact -> logger.info("Loading artifact with id {}", id))
                 .onErrorResume(IllegalArgumentException.class, e -> {

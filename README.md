@@ -49,36 +49,9 @@ The Data Processor module is responsible for handling artifact meta-information.
 
 Core Backend is the module that the user interacts with to add artifacts. It sends requests via Kafka to other modules and, after receiving the results, executes them.
 
-## Open API
-
-### REST API `api/v1/artifacts`
-
-#### Upload Artifact
-```http
-POST /upload
-```
-- **Request Body**: `ArtifactCreateRequest`.
-```java
-public class ArtifactCreateRequest {
-    private String name;
-    private byte[] artifactBody;
-  ...
-}
-```
-- **Response**: `ArtifactResponse` containing details of the created artifact.
-
-#### Load Artifact
-```http
-GET /loadArtifact/{id}
-```
-- **Path Parameters**:
-  - `id` - externalId of the artifact to be loaded.
-- **Response**: `ArtifactLoadResponse` containing the details of the requested artifact.
-
-#### Delete Artifact
-```http
-DELETE /deleteArtifact/{id}
-```
-- **Path Parameters**:
-  - `id` - externalId of the artifact to be deleted.
-- **Response**: boolean (indicates if the deletion was successful).
+- **Actuator is available at:** `/actuator`
+- **API description:**
+    - **JSON:**
+        - Path: `/api/v1/docs`
+    - **Swagger UI:**
+        - Path: `/api/v1/docs-ui.html`
