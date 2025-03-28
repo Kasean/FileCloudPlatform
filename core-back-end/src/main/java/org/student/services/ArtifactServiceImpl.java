@@ -34,7 +34,7 @@ public class ArtifactServiceImpl implements ArtifactsService{
 
     @Override
     public Mono<ArtifactResponse> upload(ArtifactCreateRequest request){
-       var baseArtifactMessage = send("tpc1",request, BaseArtifactMessage.class,null);
+       var baseArtifactMessage = send("tpc1",request.getArtifactBody(), BaseArtifactMessage.class,null);
        if (baseArtifactMessage.getResponseCode().equals(ResponseCode.CREATED)){
            UUID baseArtifactInternalId = baseArtifactMessage.getInternalId();
            int requestLength = request.getArtifactBody().length;
@@ -73,11 +73,8 @@ public class ArtifactServiceImpl implements ArtifactsService{
             byte[] valueBytes = objectMapper.writeValueAsBytes(requestObject);
 
             ProducerRecord<String,byte[]> producerRecord =
-                    new ProducerRecord<>(requestTopic,correlationId,valueBytes);
+                    createProducerRecord(requestTopic,valueBytes,headers,correlationId);
 
-            if (headers!=null){
-                headers.forEach((key,value)->producerRecord.headers().add(key,value));
-            }
             var resultBytes = kafkaRequestReplyService.sendAndReceive(producerRecord,correlationId);
             return objectMapper.readValue(
                     resultBytes,
@@ -87,6 +84,32 @@ public class ArtifactServiceImpl implements ArtifactsService{
         throw new RuntimeException(e.getMessage());
         }
 
+    }
+
+    private <T> T send(String requestTopic, byte[] valueBytes, Class<T> responseClass, Map<String,byte[]> headers){
+        String correlationId = UUID.randomUUID().toString();
+        try {
+            ProducerRecord<String,byte[]> producerRecord =
+                    createProducerRecord(requestTopic,valueBytes,headers,correlationId);
+
+            var resultBytes = kafkaRequestReplyService.sendAndReceive(producerRecord,correlationId);
+            return objectMapper.readValue(
+                    resultBytes,
+                    responseClass
+            );
+        }catch (IOException e){
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    private ProducerRecord<String,byte[]> createProducerRecord(String requestTopic, byte[] valueBytes, Map<String,byte[]> headers, String correlationId){
+        ProducerRecord<String,byte[]> producerRecord =
+                new ProducerRecord<>(requestTopic,correlationId,valueBytes);
+
+        if (headers!=null){
+            headers.forEach((key,value)->producerRecord.headers().add(key,value));
+        }
+        return producerRecord;
     }
     @Override
     public Flux<ArtifactResponse> getAllArtifacts() {
