@@ -9,13 +9,15 @@
 ### Application ports:
 
 1. core application - 8080
-2. keycloak - 9990
+2. data application - 8083
+3. keycloak - 9990
+4. kafka - 9092
 
 ### Base structure
 
 ![Structure](docs/pictures/FileCloudStorageBaseStruct.png)
 
-# Modules Documentation
+---
 
 ## 1. Artifact Processor
 
@@ -37,5 +39,19 @@ In the first beta version, we will implement either [Riak KV](https://riak.com/p
 
 The Data Processor module is responsible for handling artifact meta-information.
 
-- **External Identifier:** When saving data, the Data Processor generates an external identifier, which allows for information access.
-- **Internal Identifier:** The internal identifier, under which the artifact is registered in the system, remains hidden throughout the entire process. It can only be obtained using a special method.
+---
+
+## 3. Core Backend
+
+### Base Structure
+
+![Core Backend Structure](docs/pictures/CoreBackendStruct.png)
+
+Core Backend is the module that the user interacts with to add artifacts. It sends requests via Kafka to other modules and, after receiving the results, executes them.
+
+- **Actuator is available at:** `/actuator`
+- **API description:**
+    - **JSON:**
+        - Path: `/api/v1/docs`
+    - **Swagger UI:**
+        - Path: `/api/v1/docs-ui.html`

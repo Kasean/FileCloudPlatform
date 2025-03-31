@@ -9,6 +9,7 @@ import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.KafkaAdmin;
 import org.student.messaging.config.properties.KafkaProperties;
 import org.student.messaging.config.properties.TopicProperties;
+import org.student.messaging.topics.KafkaTopics;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic saveInfoTopic() {
-        return TopicBuilder.name("save-info-topic")
+        return TopicBuilder.name(KafkaTopics.CrudMeta.SAVE_META_INFO_TOPIC)
                 .partitions(topicProperties.getPartitionCount())
                 .replicas(topicProperties.getReplicaCount())
                 .build();
@@ -41,7 +42,7 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic getExtInfoTopic() {
-        return TopicBuilder.name("get-ext-info-topic")
+        return TopicBuilder.name(KafkaTopics.CrudMeta.GET_EXT_META_INFO_TOPIC)
                 .partitions(topicProperties.getPartitionCount())
                 .replicas(topicProperties.getReplicaCount())
                 .build();
@@ -49,7 +50,7 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic getIntInfoTopic() {
-        return TopicBuilder.name("get-int-info-topic")
+        return TopicBuilder.name(KafkaTopics.CrudMeta.GET_INT_META_INFO_TOPIC)
                 .partitions(topicProperties.getPartitionCount())
                 .replicas(topicProperties.getReplicaCount())
                 .build();
@@ -57,7 +58,7 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic delInfoTopic() {
-        return TopicBuilder.name("del-info-topic")
+        return TopicBuilder.name(KafkaTopics.CrudMeta.DEL_META_INFO)
                 .partitions(topicProperties.getPartitionCount())
                 .replicas(topicProperties.getReplicaCount())
                 .build();
@@ -65,7 +66,7 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic saveResponseTopic() {
-        return TopicBuilder.name("save-response-topic")
+        return TopicBuilder.name(KafkaTopics.ResponseMeta.SAVE_RESPONSE_TOPIC)
                 .partitions(topicProperties.getPartitionCount())
                 .replicas(topicProperties.getReplicaCount())
                 .build();
@@ -73,7 +74,7 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic delResponseTopic() {
-        return TopicBuilder.name("del-response-topic")
+        return TopicBuilder.name(KafkaTopics.ResponseMeta.DEL_RESPONSE_TOPIC)
                 .partitions(topicProperties.getPartitionCount())
                 .replicas(topicProperties.getReplicaCount())
                 .build();
@@ -81,7 +82,7 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic getExtResponseTopic() {
-        return TopicBuilder.name("get-ext-response-topic")
+        return TopicBuilder.name(KafkaTopics.ResponseMeta.GET_EXT_INFO_RESPONSE_TOPIC)
                 .partitions(topicProperties.getPartitionCount())
                 .replicas(topicProperties.getReplicaCount())
                 .build();
@@ -89,7 +90,15 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic getIntResponseTopic() {
-        return TopicBuilder.name("get-int-response-topic")
+        return TopicBuilder.name(KafkaTopics.ResponseMeta.GET_INT_INFO_RESPONSE_TOPIC)
+                .partitions(topicProperties.getPartitionCount())
+                .replicas(topicProperties.getReplicaCount())
+                .build();
+    }
+
+    @Bean
+    public NewTopic getErrorResponseTopic() {
+        return TopicBuilder.name(KafkaTopics.ResponseMeta.ERROR_RESPONSE_TOPIC)
                 .partitions(topicProperties.getPartitionCount())
                 .replicas(topicProperties.getReplicaCount())
                 .build();

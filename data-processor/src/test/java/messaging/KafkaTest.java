@@ -7,7 +7,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.student.Application;
+import org.student.DataApplication;
 import org.student.dto.ExternalMetaInfoDto;
 import org.student.dto.InternalMetaInfoDto;
 import org.student.messaging.MessageProducer;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 @Testcontainers
-@SpringBootTest(classes = {Application.class})
+@SpringBootTest(classes = {DataApplication.class})
 public class KafkaTest {
 
     @SpyBean
@@ -54,7 +54,7 @@ public class KafkaTest {
 
         when(metaInfoService.saveMetaInfo(any(ArtifactMetadataUploadRequest.class))).thenReturn(mockUuid);
 
-        messageProducer.sendArtifact(request, KafkaTopics.CrudMeta.SAVE_META_INFO_TOPIC);
+        messageProducer.sendArtifact(request, KafkaTopics.CrudMeta.SAVE_META_INFO_TOPIC,"key");
 
         await()
                 .atMost(5, TimeUnit.SECONDS)
@@ -64,7 +64,7 @@ public class KafkaTest {
                     ArgumentCaptor<UUID> uuidCaptor = ArgumentCaptor.forClass(UUID.class);
                     ArgumentCaptor<String> topicCaptor = ArgumentCaptor.forClass(String.class);
 
-                    verify(messageProducer, times(1)).sendUUID(uuidCaptor.capture(), topicCaptor.capture());
+                    verify(messageProducer, times(1)).sendUUID(uuidCaptor.capture(), topicCaptor.capture(),anyString());
 
                     String actualTopic = topicCaptor.getValue();
                     UUID actualUuid = uuidCaptor.getValue();
@@ -87,7 +87,7 @@ public class KafkaTest {
         ExternalMetaInfoDto metaInfoDto = new ExternalMetaInfoDto(mockUuid,"artifactName",12345L);
         when(metaInfoService.readExternalMetaInfo(any(UUID.class))).thenReturn(Optional.of(metaInfoDto));
 
-        messageProducer.sendUUID(mockUuid,KafkaTopics.CrudMeta.GET_EXT_META_INFO_TOPIC);
+        messageProducer.sendUUID(mockUuid,KafkaTopics.CrudMeta.GET_EXT_META_INFO_TOPIC,"key");
 
         await()
                 .atMost(5, TimeUnit.SECONDS)
@@ -97,7 +97,7 @@ public class KafkaTest {
                     ArgumentCaptor<ExternalMetaInfoDto> externalInfoDto = ArgumentCaptor.forClass(ExternalMetaInfoDto.class);
                     ArgumentCaptor<String> topicCaptor = ArgumentCaptor.forClass(String.class);
 
-                    verify(messageProducer, times(1)).sendExternalMeta(externalInfoDto.capture(), topicCaptor.capture());
+                    verify(messageProducer, times(1)).sendExternalMeta(externalInfoDto.capture(), topicCaptor.capture(),anyString());
 
                     String actualTopic = topicCaptor.getValue();
                     ExternalMetaInfoDto actualMeta = externalInfoDto.getValue();
@@ -119,7 +119,7 @@ public class KafkaTest {
         InternalMetaInfoDto metaInfoDto = new InternalMetaInfoDto(UUID.randomUUID(),"artifactName",12345L);
         when(metaInfoService.readInternalMetaInfoDto(any(UUID.class))).thenReturn(Optional.of(metaInfoDto));
 
-        messageProducer.sendUUID(UUID.randomUUID(),KafkaTopics.CrudMeta.GET_INT_META_INFO_TOPIC);
+        messageProducer.sendUUID(UUID.randomUUID(),KafkaTopics.CrudMeta.GET_INT_META_INFO_TOPIC,"key");
 
         await()
                 .atMost(5, TimeUnit.SECONDS)
@@ -129,7 +129,7 @@ public class KafkaTest {
                     ArgumentCaptor<InternalMetaInfoDto> internalInfoDto = ArgumentCaptor.forClass(InternalMetaInfoDto.class);
                     ArgumentCaptor<String> topicCaptor = ArgumentCaptor.forClass(String.class);
 
-                    verify(messageProducer, times(1)).sendInternalMeta(internalInfoDto.capture(), topicCaptor.capture());
+                    verify(messageProducer, times(1)).sendInternalMeta(internalInfoDto.capture(), topicCaptor.capture(),anyString());
 
                     String actualTopic = topicCaptor.getValue();
                     InternalMetaInfoDto actualMeta = internalInfoDto.getValue();
@@ -149,7 +149,7 @@ public class KafkaTest {
     void delDataInfoTest() throws Exception {
         when(metaInfoService.deleteMetaInfo(any(UUID.class))).thenReturn(true);
 
-        messageProducer.sendUUID(UUID.randomUUID(),KafkaTopics.CrudMeta.DEL_META_INFO);
+        messageProducer.sendUUID(UUID.randomUUID(),KafkaTopics.CrudMeta.DEL_META_INFO,"key");
 
         await()
                 .atMost(5, TimeUnit.SECONDS)
@@ -159,7 +159,7 @@ public class KafkaTest {
                     ArgumentCaptor<Boolean> delResult = ArgumentCaptor.forClass(Boolean.class);
                     ArgumentCaptor<String> topicCaptor = ArgumentCaptor.forClass(String.class);
 
-                    verify(messageProducer, times(1)).sendBoolean(delResult.capture(), topicCaptor.capture());
+                    verify(messageProducer, times(1)).sendBoolean(delResult.capture(), topicCaptor.capture(),anyString());
 
                     String actualTopic = topicCaptor.getValue();
                     Boolean actualDelResult = delResult.getValue();
