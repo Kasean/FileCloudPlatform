@@ -1,10 +1,14 @@
 package org.student.api.models;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.student.api.serializer.ByteArrayAsNumberArraySerializer;
+
 import java.util.Arrays;
 import java.util.UUID;
 
 public class ArtifactLoadResponse extends ArtifactResponse{
 
+    @JsonSerialize(using = ByteArrayAsNumberArraySerializer.class)
     private byte[] artifactBody;
 
     public ArtifactLoadResponse(byte[] artifactBody) {
