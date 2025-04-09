@@ -7,15 +7,19 @@ spring:
   main:
     banner-mode: off
   datasource:
-    url: jdbc:postgresql://localhost:5432/cloudplatform
+    url: jdbc:postgresql://localhost:5555/cloudplatform
     username: core_user
     password: sd$2sq1K52Fa
+    driver-class-name: org.postgresql.Driver
   liquibase:
     change-log: db/changelog/db.changelog-master.yaml
-    enabled: true
+    url: ${spring.datasource.url}
+    password: ${spring.datasource.password}
+    user: ${spring.datasource.username}
+  jpa:
+    open-in-view: false
 springdoc:
   api-docs:
     path: /api/v1/docs
   swagger-ui:
     path: /api/v1/docs-ui.html
-

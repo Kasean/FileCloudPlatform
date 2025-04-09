@@ -17,11 +17,13 @@ services:
       - postgres
 
   postgres:
-    image: postgres:15
+    image: postgres:latest
     environment:
       - POSTGRES_DB=keycloak
       - POSTGRES_USER=keycloak
       - POSTGRES_PASSWORD=password
+    ports:
+      - "5555:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ../sql/init.sql:/docker-entrypoint-initdb.d/init.sql

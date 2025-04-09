@@ -7,7 +7,7 @@ CREATE DATABASE cloudplatform OWNER core_user;
 SET ROLE core_user;
 
 CREATE TABLE users(
-                      id SERIAL PRIMARY KEY NOT NULL,
+                      id UUID PRIMARY KEY NOT NULL,
                       name VARCHAR(50) NOT NULL,
                       password VARCHAR(100) NOT NULL,
                       email VARCHAR(100) NOT NULL,

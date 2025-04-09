@@ -1,5 +1,34 @@
 databaseChangeLog:
   - changeSet:
-      id: baseline
-      author: ivan
-      changes: []
+      id: add-unique-constraint
+      author: DevKarmanov
+      changes:
+        - addUniqueConstraint:
+            tableName: users
+            columnNames: name, email
+            constraintName: uk_users_name_email
+
+  - changeSet:
+      id: create-necessary-extension
+      author: DevKarmanov
+      changes:
+        - sql:
+            sql: 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
+        - sql:
+            sql: 'CREATE EXTENSION IF NOT EXISTS pgcrypto;'
+
+  - changeSet:
+      id: create-test-user
+      author: DevKarmanov
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO users(id, name, password, email, created_at)
+              VALUES (
+                uuid_generate_v4(),
+                'test-user',
+                crypt('password', gen_salt('bf')),
+                'mail@example.com',
+                NOW()
+              )
+              ON CONFLICT ON CONSTRAINT uk_users_name_email DO NOTHING;
