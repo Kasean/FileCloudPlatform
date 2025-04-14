@@ -1,7 +1,8 @@
 databaseChangeLog:
   - changeSet:
-      id: add-unique-constraint
+      id: 1
       author: DevKarmanov
+      comment: Adding a unique name and email constraint
       changes:
         - addUniqueConstraint:
             tableName: users
@@ -9,8 +10,9 @@ databaseChangeLog:
             constraintName: uk_users_name_email
 
   - changeSet:
-      id: create-necessary-extension
+      id: 2
       author: DevKarmanov
+      comment: Creating the necessary uuid-ossp and pgcrypto extensions
       changes:
         - sql:
             sql: 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
@@ -18,8 +20,9 @@ databaseChangeLog:
             sql: 'CREATE EXTENSION IF NOT EXISTS pgcrypto;'
 
   - changeSet:
-      id: create-test-user
+      id: 3
       author: DevKarmanov
+      comment: Adding a test user
       changes:
         - sql:
             sql: |
