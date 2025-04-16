@@ -67,7 +67,7 @@ public class KafkaConfig {
         configProp.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
         configProp.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         configProp.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        configProp.put(JsonDeserializer.TYPE_MAPPINGS,"uuid:java.util.UUID, artifactMetadataUploadRequest:org.student.messaging.models.ArtifactMetadataUploadRequest");
+        configProp.put(JsonDeserializer.TYPE_MAPPINGS,"uuid:java.util.UUID, artifactMetadataUploadRequest:org.student.messaging.models.ArtifactMetadataUploadRequest, userArtifactMetadataUploadRequest:org.student.messaging.models.UserArtifactMetadataUploadRequest, artifactMetadataGetRequest:org.student.messaging.models.ArtifactMetadataGetRequest");
         configProp.put(JsonDeserializer.TRUSTED_PACKAGES,"java.util, java.lang, org.student.messaging.models");
         configProp.put(ConsumerConfig.GROUP_ID_CONFIG,"data-processor-group");
         return new DefaultKafkaConsumerFactory<>(configProp);

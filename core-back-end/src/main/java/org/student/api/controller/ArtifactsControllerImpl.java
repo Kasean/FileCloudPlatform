@@ -81,4 +81,37 @@ public class ArtifactsControllerImpl implements ArtifactsController {
         return artifactsService.deleteArtifact(id).doOnNext(artifactResponse -> logger.info("Artifact {} deleted", artifactResponse));
     }
 
+    @Override
+    public Mono<ArtifactResponse> uploadArtifact(UUID userId, ArtifactCreateRequest request) {
+        logger.info("Creating artifact from request: {}", request);
+        return artifactsService.upload(userId,request)
+                .doOnNext(artifactResponse -> logger.info("Created artifact: {}", artifactResponse))
+                .onErrorResume(UploadDataException.class, e -> {
+                    logger.error("Upload failed: {}", e.getMessage());
+                    return Mono.error(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
+                });
+    }
+
+    @Override
+    public Flux<ArtifactResponse> getAllArtifacts(UUID userId) {
+        return artifactsService.getAllArtifacts(userId)
+                .doOnNext(artifact -> logger.info("Received artifact info from storage: {}", artifact));
+    }
+
+    @Override
+    public Mono<ArtifactLoadResponse> loadArtifact(UUID artifactId, UUID userId) {
+        return artifactsService.getArtifactById(artifactId,userId)
+                .doOnNext(artifact -> logger.info("Loading artifact with id {}", artifactId))
+                .onErrorResume(IllegalArgumentException.class, e -> {
+                    logger.error("load failed: {}", e.getMessage());
+                    return Mono.error(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
+                });
+    }
+
+    @Override
+    public Mono<ArtifactResponse> deleteArtifact(UUID artifactId, UUID userId) {
+        return artifactsService.deleteArtifact(artifactId,userId)
+                .doOnNext(artifactResponse -> logger.info("Artifact {} deleted", artifactResponse));
+    }
+
 }

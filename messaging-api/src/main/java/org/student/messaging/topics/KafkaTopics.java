@@ -3,10 +3,19 @@ package org.student.messaging.topics;
 public class KafkaTopics {
 
     public static class CrudMeta {
+        @Deprecated
         public static final String SAVE_META_INFO_TOPIC = "save-info-topic";
+        @Deprecated
         public static final String GET_EXT_META_INFO_TOPIC = "get-ext-info-topic";
+        @Deprecated
         public static final String GET_INT_META_INFO_TOPIC = "get-int-info-topic";
+        @Deprecated
         public static final String DEL_META_INFO = "del-info-topic";
+
+        public static final String SAVE_USER_META_INFO_TOPIC = "save-user-info-topic";
+        public static final String GET_USER_EXT_META_INFO_TOPIC = "get-user-ext-info-topic";
+        public static final String GET_USER_INT_META_INFO_TOPIC = "get-user-int-info-topic";
+        public static final String DEL_USER_META_INFO = "del-user-info-topic";
     }
 
     public static class ResponseMeta {

@@ -8,10 +8,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.student.api.models.*;
 import org.student.exceptions.messaging.UploadDataException;
-import org.student.messaging.models.ArtifactMetadataUploadRequest;
-import org.student.messaging.models.BaseArtifactMessage;
-import org.student.messaging.models.BodyArtifactMessage;
-import org.student.messaging.models.ResponseCode;
+import org.student.messaging.models.*;
 import org.student.messaging.topics.KafkaTopics;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -154,12 +151,98 @@ public class ArtifactServiceImpl implements ArtifactsService{
         return Mono.error(()->new IllegalArgumentException("There was an error, check id"));
     }
 
+    @Override
+    public Mono<ArtifactResponse> upload(UUID userId, ArtifactCreateRequest request) {
+        var baseArtifactMessage = send("tpc1",request.getArtifactBody(), BaseArtifactMessage.class,null);
+        if (baseArtifactMessage.getResponseCode().equals(ResponseCode.CREATED)){
+            UUID baseArtifactInternalId = baseArtifactMessage.getInternalId();
+            int requestLength = request.getArtifactBody().length;
+            var metaData = new UserArtifactMetadataUploadRequest(
+                    request.getName(),
+                    baseArtifactInternalId,
+                    (long)requestLength,
+                    userId);
+            var externalArtefactId = send(
+                    KafkaTopics.CrudMeta.SAVE_USER_META_INFO_TOPIC,
+                    metaData,
+                    UUID.class,
+                    Map.of("__TypeId__","userArtifactMetadataUploadRequest".getBytes(StandardCharsets.UTF_8)));
+            if (externalArtefactId!=null){
+                return Mono.just(new ArtifactResponse(externalArtefactId,new ArtifactMateInfo(request.getName(),requestLength)));
+            }else {
+                rollbackArtifact(baseArtifactInternalId);
+                logger.error("Error after sending a request to " + KafkaTopics.CrudMeta.SAVE_USER_META_INFO_TOPIC +" topic");
+            }
+        } else {
+            logger.error("Error after sending a request to 'tpc1' topic");
+        }
+        return Mono.error(()-> new UploadDataException("An error occurred during artifact creation"));
+    }
+
+    @Override
+    public Flux<ArtifactResponse> getAllArtifacts(UUID userId) {
+        return null;
+    }
+
+    @Override
+    public Mono<ArtifactLoadResponse> getArtifactById(UUID artifactId, UUID userId) {
+        var internalMetaInfoDto = send(KafkaTopics.CrudMeta.GET_USER_INT_META_INFO_TOPIC,new ArtifactMetadataGetRequest(userId,artifactId),InternalMetaInfoDto.class,
+                Map.of("__TypeId__","artifactMetadataGetRequest".getBytes(StandardCharsets.UTF_8)));
+        if(internalMetaInfoDto!=null){
+            var bodyArtifactMessage = send("tpr1",internalMetaInfoDto.internalId(), BodyArtifactMessage.class,null);
+            return Mono.just(
+                    new ArtifactLoadResponse(
+                            artifactId,
+                            new ArtifactMateInfo(
+                                    internalMetaInfoDto.artifactName(),
+                                    internalMetaInfoDto.artifactSize()),
+                            bodyArtifactMessage.getArtifactBody()));
+        }
+        return Mono.error(()-> new IllegalArgumentException("There was an error, check id"));
+    }
+
+    @Override
+    public Mono<ArtifactResponse> deleteArtifact(UUID artifactId, UUID userId) {
+        var internalMetaInfo = send(KafkaTopics.CrudMeta.GET_USER_INT_META_INFO_TOPIC,
+                new ArtifactMetadataGetRequest(userId,artifactId),
+                InternalMetaInfoDto.class,
+                Map.of("__TypeId__","artifactMetadataGetRequest".getBytes(StandardCharsets.UTF_8)));
+        if (internalMetaInfo!=null){
+            boolean metaInfoDeleted = send(KafkaTopics.CrudMeta.DEL_USER_META_INFO,
+                    new ArtifactMetadataGetRequest(userId,artifactId),
+                    Boolean.class,
+                    Map.of("__TypeId__","artifactMetadataGetRequest".getBytes(StandardCharsets.UTF_8)));
+            if (metaInfoDeleted){
+                UUID internalArtifactId = internalMetaInfo.internalId();
+                String artifactName = internalMetaInfo.artifactName();
+                long artifactSize = internalMetaInfo.artifactSize();
+
+                var bodyArtifactMessage = send("tpd1",internalArtifactId, BodyArtifactMessage.class,null);
+                if (bodyArtifactMessage.getResponseCode().equals(ResponseCode.DELETED)){
+                    return Mono.just(new ArtifactResponse(artifactId,new ArtifactMateInfo(artifactName, artifactSize)));
+                }else {
+                    rollBackUserDeletedMetaInfo(internalArtifactId,artifactName,artifactSize);
+                }
+            }
+        }
+        return Mono.error(()->new IllegalArgumentException("There was an error, check id"));
+    }
+
     @Async
     protected void rollBackDeletedMetaInfo(UUID internalId,String artefactName,long artefactSize){
         send(KafkaTopics.CrudMeta.SAVE_META_INFO_TOPIC,
                 new ArtifactMetadataUploadRequest(internalId,artefactName,artefactSize),
                 UUID.class,
                 Map.of("__TypeId__","artifactMetadataUploadRequest".getBytes(StandardCharsets.UTF_8)));
+        logger.info("METAINFORMATION RECOVERED");
+    }
+
+    @Async
+    protected void rollBackUserDeletedMetaInfo(UUID internalId,String artefactName,long artefactSize){
+        send(KafkaTopics.CrudMeta.SAVE_USER_META_INFO_TOPIC,
+                new ArtifactMetadataUploadRequest(internalId,artefactName,artefactSize),
+                UUID.class,
+                Map.of("__TypeId__","userArtifactMetadataUploadRequest".getBytes(StandardCharsets.UTF_8)));
         logger.info("METAINFORMATION RECOVERED");
     }
 

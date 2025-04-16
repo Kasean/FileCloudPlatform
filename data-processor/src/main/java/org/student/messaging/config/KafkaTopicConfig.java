@@ -33,6 +33,7 @@ public class KafkaTopicConfig {
     }
 
     @Bean
+    @Deprecated
     public NewTopic saveInfoTopic() {
         return TopicBuilder.name(KafkaTopics.CrudMeta.SAVE_META_INFO_TOPIC)
                 .partitions(topicProperties.getPartitionCount())
@@ -41,6 +42,7 @@ public class KafkaTopicConfig {
     }
 
     @Bean
+    @Deprecated
     public NewTopic getExtInfoTopic() {
         return TopicBuilder.name(KafkaTopics.CrudMeta.GET_EXT_META_INFO_TOPIC)
                 .partitions(topicProperties.getPartitionCount())
@@ -49,6 +51,7 @@ public class KafkaTopicConfig {
     }
 
     @Bean
+    @Deprecated
     public NewTopic getIntInfoTopic() {
         return TopicBuilder.name(KafkaTopics.CrudMeta.GET_INT_META_INFO_TOPIC)
                 .partitions(topicProperties.getPartitionCount())
@@ -57,6 +60,7 @@ public class KafkaTopicConfig {
     }
 
     @Bean
+    @Deprecated
     public NewTopic delInfoTopic() {
         return TopicBuilder.name(KafkaTopics.CrudMeta.DEL_META_INFO)
                 .partitions(topicProperties.getPartitionCount())
@@ -99,6 +103,38 @@ public class KafkaTopicConfig {
     @Bean
     public NewTopic getErrorResponseTopic() {
         return TopicBuilder.name(KafkaTopics.ResponseMeta.ERROR_RESPONSE_TOPIC)
+                .partitions(topicProperties.getPartitionCount())
+                .replicas(topicProperties.getReplicaCount())
+                .build();
+    }
+
+    @Bean
+    public NewTopic userSaveInfoTopic() {
+        return TopicBuilder.name(KafkaTopics.CrudMeta.SAVE_USER_META_INFO_TOPIC)
+                .partitions(topicProperties.getPartitionCount())
+                .replicas(topicProperties.getReplicaCount())
+                .build();
+    }
+
+    @Bean
+    public NewTopic userGetExtInfoTopic() {
+        return TopicBuilder.name(KafkaTopics.CrudMeta.GET_USER_EXT_META_INFO_TOPIC)
+                .partitions(topicProperties.getPartitionCount())
+                .replicas(topicProperties.getReplicaCount())
+                .build();
+    }
+
+    @Bean
+    public NewTopic userGetIntInfoTopic() {
+        return TopicBuilder.name(KafkaTopics.CrudMeta.GET_USER_INT_META_INFO_TOPIC)
+                .partitions(topicProperties.getPartitionCount())
+                .replicas(topicProperties.getReplicaCount())
+                .build();
+    }
+
+    @Bean
+    public NewTopic userDelInfoTopic() {
+        return TopicBuilder.name(KafkaTopics.CrudMeta.DEL_USER_META_INFO)
                 .partitions(topicProperties.getPartitionCount())
                 .replicas(topicProperties.getReplicaCount())
                 .build();

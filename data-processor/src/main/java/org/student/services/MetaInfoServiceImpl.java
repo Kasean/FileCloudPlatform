@@ -5,7 +5,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.student.dto.ExternalMetaInfoDto;
 import org.student.dto.InternalMetaInfoDto;
+import org.student.messaging.models.ArtifactMetadataGetRequest;
 import org.student.messaging.models.ArtifactMetadataUploadRequest;
+import org.student.messaging.models.UserArtifactMetadataUploadRequest;
 import org.student.repositories.MetaInfoStorage;
 import org.student.utility.MetaInfoMapper;
 
@@ -51,5 +53,36 @@ public class MetaInfoServiceImpl implements MetaInfoService{
     public boolean deleteMetaInfo(UUID key) {
         logger.info("Method deleteMetaInfo was called");
         return storage.deleteByKey(key);
+    }
+
+    @Override
+    public UUID saveMetaInfo(UserArtifactMetadataUploadRequest request) {
+        logger.info("Method saveMetaInfo was called");
+        return storage.save(request.getUserId(),
+                MetaInfoMapper.toInternalMetaInfoDto(request));
+    }
+
+    @Override
+    public Optional<ExternalMetaInfoDto> readExternalMetaInfo(ArtifactMetadataGetRequest request) {
+        Optional<ExternalMetaInfoDto> info = storage.getExternalMetaInfo(request.getUserId(),request.getArtifactId());
+        if (info.isEmpty()){
+            logger.warn("No information about external meta-info was found");
+        }
+        return info;
+    }
+
+    @Override
+    public Optional<InternalMetaInfoDto> readInternalMetaInfoDto(ArtifactMetadataGetRequest request) {
+        Optional<InternalMetaInfoDto> info = storage.getInternalMetaInfoDto(request.getUserId(),request.getArtifactId());
+        if (info.isEmpty()){
+            logger.warn("No information about internal meta-info was found");
+        }
+        return info;
+    }
+
+    @Override
+    public boolean deleteMetaInfo(ArtifactMetadataGetRequest request) {
+        logger.info("Method deleteMetaInfo was called");
+        return storage.deleteByKey(request.getUserId(),request.getArtifactId());
     }
 }

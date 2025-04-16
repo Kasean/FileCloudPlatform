@@ -4,9 +4,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class ArtifactCreateRequest {
-
     private String name;
-
     private byte[] artifactBody;
 
     public ArtifactCreateRequest(String name, byte[] artifactBody) {

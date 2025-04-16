@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class MetaInfoStorage implements MetaInfoRepository{
-
+    private final Map<UUID, Map<UUID, InternalMetaInfoDto>> artifacts = new ConcurrentHashMap<>();
     private final Map<UUID, InternalMetaInfoDto> internalStorage = new ConcurrentHashMap<>();
 
     @Override
@@ -55,4 +55,40 @@ public class MetaInfoStorage implements MetaInfoRepository{
     public boolean deleteByKey(UUID key) {
         return internalStorage.remove(key)!=null;
     }
+
+    @Override
+    public UUID save(UUID userId, InternalMetaInfoDto internalMetaInfoDto) {
+        UUID externalId = UUID.randomUUID();
+
+        Map<UUID, InternalMetaInfoDto> userArtifacts =
+                artifacts.computeIfAbsent(userId, k -> new ConcurrentHashMap<>());
+
+        userArtifacts.put(externalId, internalMetaInfoDto);
+
+        return externalId;
+    }
+
+    @Override
+    public Optional<ExternalMetaInfoDto> getExternalMetaInfo(UUID userId, UUID externalId) {
+        return Optional.ofNullable(artifacts.get(userId))
+                .map(innerMap -> innerMap.get(externalId))
+                .flatMap(dto -> Optional.of(MetaInfoMapper.toExternalMetaInfoDto(dto, externalId)));
+    }
+
+
+    @Override
+    public Optional<InternalMetaInfoDto> getInternalMetaInfoDto(UUID userId, UUID externalId) {
+        return Optional.ofNullable(artifacts.get(userId))
+                .map(innerMap -> innerMap.get(externalId));
+    }
+
+    @Override
+    public boolean deleteByKey(UUID userId, UUID externalId) {
+        Map<UUID, InternalMetaInfoDto> userArtifacts = artifacts.get(userId);
+        if (userArtifacts == null) {
+            return false;
+        }
+        return userArtifacts.remove(externalId) != null;
+    }
+
 }
