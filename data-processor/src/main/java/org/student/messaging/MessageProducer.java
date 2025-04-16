@@ -11,6 +11,7 @@ import org.student.exceptions.messaging.KafkaSendException;
 import org.student.messaging.models.ArtifactMetadataUploadRequest;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -42,6 +43,10 @@ public class MessageProducer {
 
     public void sendBoolean(Boolean bool, String topic, String key) throws ExecutionException, JsonProcessingException, InterruptedException, KafkaSendException {
         sendWithToken(bool,topic,key,"delResult");
+    }
+
+    public void sendList(List<ExternalMetaInfoDto> userArtifacts, String topic, String key) throws ExecutionException, JsonProcessingException, InterruptedException, KafkaSendException {
+        sendWithoutToken(userArtifacts,topic,key);
     }
 
     public void sendError(String topic,String key){

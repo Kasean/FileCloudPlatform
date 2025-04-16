@@ -1,5 +1,6 @@
 package org.student.services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.logging.log4j.LogManager;
@@ -15,6 +16,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -82,6 +84,26 @@ public class ArtifactServiceImpl implements ArtifactsService{
         }
 
     }
+
+    private <T,F> T send(String requestTopic, F requestObject, TypeReference<T> responseList, Map<String,byte[]> headers){
+        String correlationId = UUID.randomUUID().toString();
+        try {
+            byte[] valueBytes = objectMapper.writeValueAsBytes(requestObject);
+
+            ProducerRecord<String,byte[]> producerRecord =
+                    createProducerRecord(requestTopic,valueBytes,headers,correlationId);
+
+            var resultBytes = kafkaRequestReplyService.sendAndReceive(producerRecord,correlationId);
+            return objectMapper.readValue(
+                    resultBytes,
+                    responseList
+            );
+        }catch (IOException e){
+            throw new RuntimeException(e.getMessage());
+        }
+
+    }
+
 
     private <T> T send(String requestTopic, byte[] valueBytes, Class<T> responseClass, Map<String,byte[]> headers){
         String correlationId = UUID.randomUUID().toString();
@@ -181,7 +203,19 @@ public class ArtifactServiceImpl implements ArtifactsService{
 
     @Override
     public Flux<ArtifactResponse> getAllArtifacts(UUID userId) {
-        return null;
+        List<ExternalMetaInfoDto> userArtifacts = send(KafkaTopics.CrudMeta.GET_USER_ALL_EXT_META_INFO,
+                userId,
+                new TypeReference<>() {},
+                Map.of("__TypeId__","uuid".getBytes(StandardCharsets.UTF_8)));
+        if (userArtifacts.isEmpty()){
+            return Flux.empty();
+        }
+
+        return Flux.fromIterable(userArtifacts)
+                .map(dto -> new ArtifactResponse(
+                        dto.externalId(),
+                        new ArtifactMateInfo(dto.artifactName(), dto.artifactSize())
+                ));
     }
 
     @Override

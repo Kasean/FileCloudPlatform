@@ -10,12 +10,14 @@ import org.student.dto.ExternalMetaInfoDto;
 import org.student.dto.InternalMetaInfoDto;
 import org.student.exceptions.DataNotFoundException;
 import org.student.exceptions.SaveDataException;
+import org.student.messaging.key.MessageKeyHolder;
 import org.student.messaging.models.ArtifactMetadataGetRequest;
 import org.student.messaging.models.ArtifactMetadataUploadRequest;
 import org.student.messaging.models.UserArtifactMetadataUploadRequest;
 import org.student.messaging.topics.KafkaTopics;
 import org.student.services.MetaInfoServiceImpl;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -40,7 +42,7 @@ public class MessageConsumer implements MetaInfoApi {
     public UUID save(ArtifactMetadataUploadRequest request) throws SaveDataException {
         logger.info("Received request to save metadata: {}", request);
         String messageKey = MessageKeyHolder.get();
-        try {
+        try(AutoCloseable ignored = MessageKeyHolder.closeable()) {
             UUID id = metaInfoService.saveMetaInfo(request);
             messageProducer.sendUUID(id,KafkaTopics.ResponseMeta.SAVE_RESPONSE_TOPIC,messageKey);
             logger.info("Metadata saved successfully with ID: {}", id);
@@ -49,8 +51,6 @@ public class MessageConsumer implements MetaInfoApi {
             logger.error("Error occurred while saving metadata: {}", e.getMessage(), e);
             messageProducer.sendError(KafkaTopics.ResponseMeta.ERROR_RESPONSE_TOPIC,messageKey);
             throw new SaveDataException("An error occurred during saving, check your request");
-        }finally {
-            MessageKeyHolder.clear();
         }
     }
 
@@ -63,7 +63,7 @@ public class MessageConsumer implements MetaInfoApi {
         logger.info("Received request to get external metadata for ID: {}", id);
 
         String messageKey = MessageKeyHolder.get();
-        try {
+        try(AutoCloseable ignored = MessageKeyHolder.closeable()) {
             ExternalMetaInfoDto metaInfoDto = metaInfoService.readExternalMetaInfo(id)
                     .orElseThrow(() -> {
                         logger.warn("No external metadata found for ID: {}", id);
@@ -75,8 +75,6 @@ public class MessageConsumer implements MetaInfoApi {
         } catch (Exception e) {
             messageProducer.sendError(KafkaTopics.ResponseMeta.ERROR_RESPONSE_TOPIC,messageKey);
             throw new DataNotFoundException("An unexpected error occurred while getting external meta-information");
-        } finally {
-            MessageKeyHolder.clear();
         }
     }
 
@@ -88,7 +86,7 @@ public class MessageConsumer implements MetaInfoApi {
     public InternalMetaInfoDto getInternalMeta(UUID id) throws DataNotFoundException {
         logger.info("Received request to get internal metadata for ID: {}", id);
         String messageKey = MessageKeyHolder.get();
-        try {
+        try(AutoCloseable ignored = MessageKeyHolder.closeable()) {
             InternalMetaInfoDto metaInfoDto = metaInfoService.readInternalMetaInfoDto(id)
                     .orElseThrow(() -> {
                         logger.warn("No internal metadata found for ID: {}", id);
@@ -100,8 +98,6 @@ public class MessageConsumer implements MetaInfoApi {
             logger.error("Error occurred while sending in-metadata: {}", e.getMessage(), e);
             messageProducer.sendError(KafkaTopics.ResponseMeta.ERROR_RESPONSE_TOPIC,messageKey);
             throw new DataNotFoundException("An unexpected error occurred while getting external meta-information");
-        }finally {
-            MessageKeyHolder.clear();
         }
     }
 
@@ -119,13 +115,11 @@ public class MessageConsumer implements MetaInfoApi {
         } else {
             logger.warn("Failed to delete metadata for ID: {}", id);
         }
-        try {
+        try(AutoCloseable ignored = MessageKeyHolder.closeable()) {
             messageProducer.sendBoolean(result,KafkaTopics.ResponseMeta.DEL_RESPONSE_TOPIC,messageKey);
         } catch (Exception e) {
             logger.error("Error occurred while sending result of del-metadata: {}", e.getMessage(), e);
             throw new RuntimeException("An unexpected error occurred while deleting meta-information");
-        }finally {
-            MessageKeyHolder.clear();
         }
 
         return result;
@@ -136,7 +130,7 @@ public class MessageConsumer implements MetaInfoApi {
     public UUID save(UserArtifactMetadataUploadRequest request) throws SaveDataException {
         logger.info("Received request to save metadata: {}", request);
         String messageKey = MessageKeyHolder.get();
-        try {
+        try(AutoCloseable ignored = MessageKeyHolder.closeable()) {
             UUID id = metaInfoService.saveMetaInfo(request);
             messageProducer.sendUUID(id,KafkaTopics.ResponseMeta.SAVE_RESPONSE_TOPIC,messageKey);
             logger.info("Metadata saved successfully with ID: {}", id);
@@ -145,8 +139,6 @@ public class MessageConsumer implements MetaInfoApi {
             logger.error("Error occurred while saving metadata: {}", e.getMessage(), e);
             messageProducer.sendError(KafkaTopics.ResponseMeta.ERROR_RESPONSE_TOPIC,messageKey);
             throw new SaveDataException("An error occurred during saving, check your request");
-        }finally {
-            MessageKeyHolder.clear();
         }
     }
 
@@ -156,7 +148,7 @@ public class MessageConsumer implements MetaInfoApi {
         logger.info("Received request to get external metadata for userId: {}", request.getUserId());
 
         String messageKey = MessageKeyHolder.get();
-        try {
+        try(AutoCloseable ignored = MessageKeyHolder.closeable()) {
             ExternalMetaInfoDto metaInfoDto = metaInfoService.readExternalMetaInfo(request)
                     .orElseThrow(() -> {
                         logger.warn("No external metadata found for artifactId: {}", request.getArtifactId());
@@ -168,8 +160,6 @@ public class MessageConsumer implements MetaInfoApi {
         } catch (Exception e) {
             messageProducer.sendError(KafkaTopics.ResponseMeta.ERROR_RESPONSE_TOPIC,messageKey);
             throw new DataNotFoundException("An unexpected error occurred while getting external meta-information");
-        } finally {
-            MessageKeyHolder.clear();
         }
     }
 
@@ -178,7 +168,7 @@ public class MessageConsumer implements MetaInfoApi {
     public InternalMetaInfoDto getInternalMeta(ArtifactMetadataGetRequest request) throws DataNotFoundException {
         logger.info("Received request to get internal metadata for userId: {}", request.getUserId());
         String messageKey = MessageKeyHolder.get();
-        try {
+        try(AutoCloseable ignored = MessageKeyHolder.closeable()) {
             InternalMetaInfoDto metaInfoDto = metaInfoService.readInternalMetaInfoDto(request)
                     .orElseThrow(() -> {
                         logger.warn("No internal metadata found for artifactId: {}", request.getArtifactId());
@@ -190,8 +180,21 @@ public class MessageConsumer implements MetaInfoApi {
             logger.error("Error occurred while sending in-metadata: {}", e.getMessage(), e);
             messageProducer.sendError(KafkaTopics.ResponseMeta.ERROR_RESPONSE_TOPIC,messageKey);
             throw new DataNotFoundException("An unexpected error occurred while getting external meta-information");
-        }finally {
-            MessageKeyHolder.clear();
+        }
+    }
+
+    @KafkaListener(id = "data-process-user-get-all-ext-listener", topicPartitions = @TopicPartition(topic = KafkaTopics.CrudMeta.GET_USER_ALL_EXT_META_INFO, partitions = {"0","1"}), groupId = "get-all-ext-meta-group")
+    @Override
+    public List<ExternalMetaInfoDto> getAll(UUID userId) throws DataNotFoundException {
+        String messageKey = MessageKeyHolder.get();
+        try(AutoCloseable ignored = MessageKeyHolder.closeable()) {
+            List<ExternalMetaInfoDto> userArtifacts = metaInfoService.getAll(userId);
+            messageProducer.sendList(userArtifacts,KafkaTopics.ResponseMeta.GET_USER_ALL_EXT_META_INFO_RESPONSE,messageKey);
+            return userArtifacts;
+        }catch (Exception e){
+            logger.error("Error occurred while sending in-metadata: {}", e.getMessage(), e);
+            messageProducer.sendError(KafkaTopics.ResponseMeta.ERROR_RESPONSE_TOPIC,messageKey);
+            throw new DataNotFoundException("An unexpected error occurred while getting all external meta-information");
         }
     }
 
@@ -206,13 +209,11 @@ public class MessageConsumer implements MetaInfoApi {
         } else {
             logger.warn("Failed to delete metadata for artifactId: {}", request.getArtifactId());
         }
-        try {
+        try(AutoCloseable ignored = MessageKeyHolder.closeable()) {
             messageProducer.sendBoolean(result,KafkaTopics.ResponseMeta.DEL_RESPONSE_TOPIC,messageKey);
         } catch (Exception e) {
             logger.error("Error occurred while sending result of del-metadata: {}", e.getMessage(), e);
             throw new RuntimeException("An unexpected error occurred while deleting meta-information");
-        }finally {
-            MessageKeyHolder.clear();
         }
 
         return result;

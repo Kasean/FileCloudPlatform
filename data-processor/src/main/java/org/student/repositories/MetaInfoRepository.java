@@ -3,6 +3,7 @@ package org.student.repositories;
 import org.student.dto.ExternalMetaInfoDto;
 import org.student.dto.InternalMetaInfoDto;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,5 +20,6 @@ public interface MetaInfoRepository {
     UUID save(UUID userId,InternalMetaInfoDto internalMetaInfoDto);
     Optional<ExternalMetaInfoDto> getExternalMetaInfo(UUID userId,UUID externalId);
     Optional<InternalMetaInfoDto> getInternalMetaInfoDto(UUID userId,UUID externalId);
+    List<ExternalMetaInfoDto> getAll(UUID userId);
     boolean deleteByKey(UUID userId,UUID externalId);
 }

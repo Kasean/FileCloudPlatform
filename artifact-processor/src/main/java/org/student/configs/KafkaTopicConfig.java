@@ -62,4 +62,5 @@ public class KafkaTopicConfig {
                 .replicas(topicProperties.getReplicaCount())
                 .build();
     }
+
 }

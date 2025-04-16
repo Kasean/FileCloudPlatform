@@ -13,6 +13,7 @@ import org.student.messaging.models.ArtifactMetadataUploadRequest;
 import org.student.messaging.models.UserArtifactMetadataUploadRequest;
 import org.student.services.MetaInfoServiceImpl;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -99,6 +100,17 @@ public class MetaInfoController implements MetaInfoApi {
                     logger.error("No internal metadata found for ID: {}", request.getArtifactId());
                     return new DataNotFoundException("Error getting internal meta-information by id");
                 });
+    }
+
+    @GetMapping("/getAll/{userId}")
+    @Override
+    public List<ExternalMetaInfoDto> getAll(@PathVariable UUID userId) throws DataNotFoundException {
+        logger.info("A GET request to get all user's artifacts was received");
+        try {
+            return metaInfoService.getAll(userId);
+        }catch (Exception e){
+            throw new DataNotFoundException("An unexpected error occurred while getting all external meta-information");
+        }
     }
 
     @DeleteMapping("/del-artifact")

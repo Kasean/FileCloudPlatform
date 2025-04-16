@@ -11,6 +11,7 @@ import org.student.messaging.models.UserArtifactMetadataUploadRequest;
 import org.student.repositories.MetaInfoStorage;
 import org.student.utility.MetaInfoMapper;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -78,6 +79,15 @@ public class MetaInfoServiceImpl implements MetaInfoService{
             logger.warn("No information about internal meta-info was found");
         }
         return info;
+    }
+
+    @Override
+    public List<ExternalMetaInfoDto> getAll(UUID userId) {
+        List<ExternalMetaInfoDto> userArtifacts = storage.getAll(userId);
+        if (userArtifacts.isEmpty()){
+            logger.info("The user's artifact list is empty");
+        }
+        return userArtifacts;
     }
 
     @Override

@@ -12,7 +12,7 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.RecordInterceptor;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
-import org.student.messaging.MessageKeyHolder;
+import org.student.messaging.key.MessageKeyHolder;
 import org.student.messaging.config.properties.KafkaProperties;
 
 import java.util.HashMap;

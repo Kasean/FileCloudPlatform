@@ -47,13 +47,6 @@ public class ArtifactsControllerImpl implements ArtifactsController {
                 });
     }
 
-    //todo not in alpha
-    @Override
-    public Flux<ArtifactResponse> getAllArtifacts() {
-        return artifactsService.getAllArtifacts()
-                .doOnNext(artifact -> logger.info("Received artifact info from storage: {}", artifact));
-    }
-
     /**
      * Loads an artifact based on its unique identifier.
      *

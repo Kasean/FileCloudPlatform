@@ -8,6 +8,7 @@ import org.student.messaging.models.ArtifactMetadataGetRequest;
 import org.student.messaging.models.ArtifactMetadataUploadRequest;
 import org.student.messaging.models.UserArtifactMetadataUploadRequest;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface MetaInfoApi {
@@ -23,5 +24,6 @@ public interface MetaInfoApi {
     UUID save(UserArtifactMetadataUploadRequest request) throws SaveDataException;
     ExternalMetaInfoDto getExternalMeta(ArtifactMetadataGetRequest request) throws DataNotFoundException;
     InternalMetaInfoDto getInternalMeta(ArtifactMetadataGetRequest request) throws DataNotFoundException;
+    List<ExternalMetaInfoDto> getAll(UUID userId) throws DataNotFoundException;
     boolean delete(ArtifactMetadataGetRequest request);
 }

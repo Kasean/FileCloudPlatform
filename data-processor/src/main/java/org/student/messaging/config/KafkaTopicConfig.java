@@ -101,6 +101,14 @@ public class KafkaTopicConfig {
     }
 
     @Bean
+    public NewTopic getAllExtResponseTopic() {
+        return TopicBuilder.name(KafkaTopics.ResponseMeta.GET_USER_ALL_EXT_META_INFO_RESPONSE)
+                .partitions(topicProperties.getPartitionCount())
+                .replicas(topicProperties.getReplicaCount())
+                .build();
+    }
+
+    @Bean
     public NewTopic getErrorResponseTopic() {
         return TopicBuilder.name(KafkaTopics.ResponseMeta.ERROR_RESPONSE_TOPIC)
                 .partitions(topicProperties.getPartitionCount())
@@ -133,10 +141,19 @@ public class KafkaTopicConfig {
     }
 
     @Bean
+    public NewTopic userGetAllExtInfoTopic() {
+        return TopicBuilder.name(KafkaTopics.CrudMeta.GET_USER_ALL_EXT_META_INFO)
+                .partitions(topicProperties.getPartitionCount())
+                .replicas(topicProperties.getReplicaCount())
+                .build();
+    }
+
+    @Bean
     public NewTopic userDelInfoTopic() {
         return TopicBuilder.name(KafkaTopics.CrudMeta.DEL_USER_META_INFO)
                 .partitions(topicProperties.getPartitionCount())
                 .replicas(topicProperties.getReplicaCount())
                 .build();
     }
+
 }

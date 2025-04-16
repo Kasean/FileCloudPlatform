@@ -1,4 +1,4 @@
-package org.student.messaging;
+package org.student.messaging.key;
 
 public class MessageKeyHolder {
     private static final ThreadLocal<String> messageKeyHolder = new ThreadLocal<>();
@@ -13,5 +13,9 @@ public class MessageKeyHolder {
 
     public static void clear() {
         messageKeyHolder.remove();
+    }
+
+    public static AutoCloseable closeable() {
+        return MessageKeyHolder::clear;
     }
 }
