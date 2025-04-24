@@ -1,7 +1,7 @@
 package org.student.repositories;
 
 import org.springframework.stereotype.Repository;
-import org.student.dto.ArtifactsStorage;
+import org.student.dto.ArtifactKey;
 import org.student.dto.ExternalMetaInfoDto;
 import org.student.dto.InternalMetaInfoDto;
 import org.student.utility.MetaInfoMapper;
@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class MetaInfoStorage implements MetaInfoRepository{
-    private final Map<UUID, ArtifactsStorage> artifacts = new ConcurrentHashMap<>();
+    private final Map<ArtifactKey, InternalMetaInfoDto> artifacts = new ConcurrentHashMap<>();
     private final Map<UUID, InternalMetaInfoDto> internalStorage = new ConcurrentHashMap<>();
 
     @Override
@@ -60,44 +60,36 @@ public class MetaInfoStorage implements MetaInfoRepository{
 
     @Override
     public UUID save(UUID userId, InternalMetaInfoDto internalMetaInfoDto) {
-        ArtifactsStorage artifactsStorage = artifacts.computeIfAbsent(userId, key -> new ArtifactsStorage());
-
-        return artifactsStorage.save(internalMetaInfoDto);
+        UUID externalId = UUID.randomUUID();
+        ArtifactKey key = new ArtifactKey(userId,externalId);
+        artifacts.put(key, internalMetaInfoDto);
+        return externalId;
     }
 
 
     @Override
     public Optional<ExternalMetaInfoDto> getExternalMetaInfo(UUID userId, UUID externalId) {
-        return Optional.ofNullable(artifacts.get(userId))
-                .map(artifactsStorage -> artifactsStorage.getExternalMetaInfo(externalId));
+        return Optional.ofNullable(artifacts.get(new ArtifactKey(userId,externalId)))
+                .map(result -> MetaInfoMapper.toExternalMetaInfoDto(result, externalId));
     }
 
 
     @Override
     public Optional<InternalMetaInfoDto> getInternalMetaInfoDto(UUID userId, UUID externalId) {
-        return Optional.ofNullable(artifacts.get(userId))
-                .map(innerMap -> innerMap.getInternalMetaInfoDto(externalId));
+        return Optional.ofNullable(artifacts.get(new ArtifactKey(userId,externalId)));
     }
 
     @Override
     public List<ExternalMetaInfoDto> getAll(UUID userId) {
-        ArtifactsStorage artifactsStorage = artifacts.get(userId);
-        if (artifactsStorage == null) {
-            return List.of();
-        }
-
-        return artifactsStorage.getArtifacts().entrySet().stream()
-                .map(entry -> MetaInfoMapper.toExternalMetaInfoDto(entry.getValue(),entry.getKey()))
+        return artifacts.entrySet().stream()
+                .filter(entry -> entry.getKey().userId().equals(userId))
+                .map(entry -> MetaInfoMapper.toExternalMetaInfoDto(entry.getValue(), entry.getKey().externalId()))
                 .toList();
     }
 
     @Override
     public boolean deleteByKey(UUID userId, UUID externalId) {
-        ArtifactsStorage userArtifacts = artifacts.get(userId);
-        if (userArtifacts == null) {
-            return false;
-        }
-        return userArtifacts.deleteByKey(externalId);
+        return artifacts.remove(new ArtifactKey(userId, externalId)) != null;
     }
 
 }
