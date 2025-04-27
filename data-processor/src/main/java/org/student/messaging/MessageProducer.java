@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.student.dto.ExternalMetaInfoDto;
 import org.student.dto.InternalMetaInfoDto;
 import org.student.exceptions.messaging.KafkaSendException;
+import org.student.messaging.models.ArtifactMetadataGetRequest;
 import org.student.messaging.models.ArtifactMetadataUploadRequest;
 
 import java.nio.charset.StandardCharsets;
@@ -25,8 +26,15 @@ public class MessageProducer {
         this.template = template;
 }
 
-    public void sendArtifact(ArtifactMetadataUploadRequest request, String topic, String key) throws JsonProcessingException, ExecutionException, InterruptedException, KafkaSendException {
-        sendWithToken(request,topic,key,"artifactMetadataUploadRequest");
+    public<T extends ArtifactMetadataUploadRequest> void sendUploadArtifact(T request, String topic, String key) throws JsonProcessingException, ExecutionException, InterruptedException, KafkaSendException {
+        String className = request.getClass().getSimpleName();
+        String formattedName = className.substring(0, 1).toLowerCase() + className.substring(1);
+
+        sendWithToken(request,topic,key,formattedName);
+    }
+
+    public void sendGetArtifact(ArtifactMetadataGetRequest request, String topic, String key) throws ExecutionException, JsonProcessingException, InterruptedException, KafkaSendException {
+        sendWithToken(request,topic,key,"artifactMetadataGetRequest");
     }
 
     public void sendUUID(UUID uuid, String topic, String key) throws JsonProcessingException, ExecutionException, InterruptedException, KafkaSendException {

@@ -11,7 +11,8 @@ import org.student.DataApplication;
 import org.student.dto.ExternalMetaInfoDto;
 import org.student.dto.InternalMetaInfoDto;
 import org.student.messaging.MessageProducer;
-import org.student.messaging.models.ArtifactMetadataUploadRequest;
+import org.student.messaging.models.ArtifactMetadataGetRequest;
+import org.student.messaging.models.UserArtifactMetadataUploadRequest;
 import org.student.messaging.topics.KafkaTopics;
 import org.student.services.MetaInfoServiceImpl;
 import org.testcontainers.containers.KafkaContainer;
@@ -19,6 +20,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -49,17 +51,17 @@ public class KafkaTest {
 
     @Test
     void saveTest() throws Exception {
-        ArtifactMetadataUploadRequest request = new ArtifactMetadataUploadRequest(UUID.randomUUID(), "ArtifactName", 1234L);
+        var request = new UserArtifactMetadataUploadRequest("artifact-name",UUID.randomUUID(),12345L,UUID.randomUUID());
         UUID mockUuid = UUID.randomUUID();
 
-        when(metaInfoService.saveMetaInfo(any(ArtifactMetadataUploadRequest.class))).thenReturn(mockUuid);
+        when(metaInfoService.saveMetaInfo(any(UserArtifactMetadataUploadRequest.class))).thenReturn(mockUuid);
 
-        messageProducer.sendArtifact(request, KafkaTopics.CrudMeta.SAVE_META_INFO_TOPIC,"key");
+        messageProducer.sendUploadArtifact(request, KafkaTopics.CrudMeta.SAVE_USER_META_INFO_TOPIC,"key");
 
         await()
                 .atMost(5, TimeUnit.SECONDS)
                 .untilAsserted(() -> {
-                    verify(metaInfoService, times(1)).saveMetaInfo(any(ArtifactMetadataUploadRequest.class));
+                    verify(metaInfoService, times(1)).saveMetaInfo(any(UserArtifactMetadataUploadRequest.class));
 
                     ArgumentCaptor<UUID> uuidCaptor = ArgumentCaptor.forClass(UUID.class);
                     ArgumentCaptor<String> topicCaptor = ArgumentCaptor.forClass(String.class);
@@ -84,15 +86,16 @@ public class KafkaTest {
     void getExternalInfoTest() throws Exception {
         UUID mockUuid = UUID.randomUUID();
 
-        ExternalMetaInfoDto metaInfoDto = new ExternalMetaInfoDto(mockUuid,"artifactName",12345L);
-        when(metaInfoService.readExternalMetaInfo(any(UUID.class))).thenReturn(Optional.of(metaInfoDto));
+        var metaInfoDto = new ExternalMetaInfoDto(mockUuid,"artifactName",12345L);
+        when(metaInfoService.readExternalMetaInfo(any(ArtifactMetadataGetRequest.class))).thenReturn(Optional.of(metaInfoDto));
 
-        messageProducer.sendUUID(mockUuid,KafkaTopics.CrudMeta.GET_EXT_META_INFO_TOPIC,"key");
+        var request = new ArtifactMetadataGetRequest(UUID.randomUUID(),mockUuid);
+        messageProducer.sendGetArtifact(request,KafkaTopics.CrudMeta.GET_USER_EXT_META_INFO_TOPIC,"key");
 
         await()
                 .atMost(5, TimeUnit.SECONDS)
                 .untilAsserted(() -> {
-                    verify(metaInfoService, times(1)).readExternalMetaInfo(any(UUID.class));
+                    verify(metaInfoService, times(1)).readExternalMetaInfo(any(ArtifactMetadataGetRequest.class));
 
                     ArgumentCaptor<ExternalMetaInfoDto> externalInfoDto = ArgumentCaptor.forClass(ExternalMetaInfoDto.class);
                     ArgumentCaptor<String> topicCaptor = ArgumentCaptor.forClass(String.class);
@@ -117,14 +120,15 @@ public class KafkaTest {
     void getInternalInfoTest() throws Exception {
 
         InternalMetaInfoDto metaInfoDto = new InternalMetaInfoDto(UUID.randomUUID(),"artifactName",12345L);
-        when(metaInfoService.readInternalMetaInfoDto(any(UUID.class))).thenReturn(Optional.of(metaInfoDto));
+        when(metaInfoService.readInternalMetaInfoDto(any(ArtifactMetadataGetRequest.class))).thenReturn(Optional.of(metaInfoDto));
 
-        messageProducer.sendUUID(UUID.randomUUID(),KafkaTopics.CrudMeta.GET_INT_META_INFO_TOPIC,"key");
+        var request = new ArtifactMetadataGetRequest(UUID.randomUUID(),UUID.randomUUID());
+        messageProducer.sendGetArtifact(request,KafkaTopics.CrudMeta.GET_USER_INT_META_INFO_TOPIC,"key");
 
         await()
                 .atMost(5, TimeUnit.SECONDS)
                 .untilAsserted(() -> {
-                    verify(metaInfoService, times(1)).readInternalMetaInfoDto(any(UUID.class));
+                    verify(metaInfoService, times(1)).readInternalMetaInfoDto(any(ArtifactMetadataGetRequest.class));
 
                     ArgumentCaptor<InternalMetaInfoDto> internalInfoDto = ArgumentCaptor.forClass(InternalMetaInfoDto.class);
                     ArgumentCaptor<String> topicCaptor = ArgumentCaptor.forClass(String.class);
@@ -147,14 +151,15 @@ public class KafkaTest {
 
     @Test
     void delDataInfoTest() throws Exception {
-        when(metaInfoService.deleteMetaInfo(any(UUID.class))).thenReturn(true);
+        when(metaInfoService.deleteMetaInfo(any(ArtifactMetadataGetRequest.class))).thenReturn(true);
 
-        messageProducer.sendUUID(UUID.randomUUID(),KafkaTopics.CrudMeta.DEL_META_INFO,"key");
+        var request = new ArtifactMetadataGetRequest(UUID.randomUUID(),UUID.randomUUID());
+        messageProducer.sendGetArtifact(request,KafkaTopics.CrudMeta.DEL_USER_META_INFO,"key");
 
         await()
                 .atMost(5, TimeUnit.SECONDS)
                 .untilAsserted(() -> {
-                    verify(metaInfoService, times(1)).deleteMetaInfo(any(UUID.class));
+                    verify(metaInfoService, times(1)).deleteMetaInfo(any(ArtifactMetadataGetRequest.class));
 
                     ArgumentCaptor<Boolean> delResult = ArgumentCaptor.forClass(Boolean.class);
                     ArgumentCaptor<String> topicCaptor = ArgumentCaptor.forClass(String.class);
@@ -173,6 +178,41 @@ public class KafkaTest {
                     );
                 });
     }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void getAllUserArtifactsTest() throws Exception {
+        UUID mockUuid = UUID.randomUUID();
+
+        var metaInfoDto = new ExternalMetaInfoDto(mockUuid,"artifactName",12345L);
+        when(metaInfoService.getAll(any(UUID.class))).thenReturn(List.of(metaInfoDto));
+
+        messageProducer.sendUUID(UUID.randomUUID(),KafkaTopics.CrudMeta.GET_USER_ALL_EXT_META_INFO,"key");
+
+        await()
+                .atMost(5, TimeUnit.SECONDS)
+                .untilAsserted(() -> {
+                    verify(metaInfoService, times(1)).getAll(any(UUID.class));
+
+                    ArgumentCaptor<List<ExternalMetaInfoDto>> listOfExternalInfoDto = ArgumentCaptor.forClass(List.class);
+                    ArgumentCaptor<String> topicCaptor = ArgumentCaptor.forClass(String.class);
+
+                    verify(messageProducer, times(1)).sendList(listOfExternalInfoDto.capture(), topicCaptor.capture(),anyString());
+
+                    String actualTopic = topicCaptor.getValue();
+                    List<ExternalMetaInfoDto> actualMeta = listOfExternalInfoDto.getValue();
+
+                    assertAll(
+                            () -> assertEquals(KafkaTopics.ResponseMeta.GET_USER_ALL_EXT_META_INFO_RESPONSE, actualTopic,
+                                    () -> String.format("Topics mismatch! Expected: '%s', but got: '%s'",
+                                            KafkaTopics.ResponseMeta.GET_USER_ALL_EXT_META_INFO_RESPONSE, actualTopic)),
+                            () -> assertNotNull(actualMeta, "Captured dto is null!"),
+                            () -> assertEquals(List.of(metaInfoDto), actualMeta,
+                                    () -> String.format("DTOs mismatch! Expected: '%s', but got: '%s'", metaInfoDto, actualMeta))
+                    );
+                });
+    }
+
 }
 
 

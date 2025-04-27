@@ -46,19 +46,20 @@ class FilesControllerTest {
 
         ArtifactMateInfo metaInfo = new ArtifactMateInfo(request.getName(), request.getArtifactBody().length);
         UUID id = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
 
         ArtifactResponse response = new ArtifactResponse(id, metaInfo);
 
-        Mockito.when(artifactsService.upload(request)).thenReturn(Mono.just(response));
+        Mockito.when(artifactsService.upload(userId,request)).thenReturn(Mono.just(response));
 
-        webTestClient.mutateWith(SecurityMockServerConfigurers.csrf()).post().uri("http://localhost:8888/api/v1/artifacts/upload")
+        webTestClient.mutateWith(SecurityMockServerConfigurers.csrf()).post().uri("http://localhost:8888/api/v1/artifacts/user/"+userId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(request))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(ArtifactResponse.class).isEqualTo(response);
 
-        Mockito.verify(artifactsService).upload(request);
+        Mockito.verify(artifactsService).upload(userId,request);
     }
 
     @Test
@@ -80,14 +81,16 @@ class FilesControllerTest {
 
         ArtifactResponse response2 = new ArtifactResponse(id2, metaInfo2);
 
-        Mockito.when(artifactsService.getAllArtifacts()).thenReturn(Flux.just(response1, response2));
+        UUID userId = UUID.randomUUID();
 
-        webTestClient.mutateWith(SecurityMockServerConfigurers.csrf()).get().uri("http://localhost:8888/api/v1/artifacts/getAll")
+        Mockito.when(artifactsService.getAllArtifacts(userId)).thenReturn(Flux.just(response1, response2));
+
+        webTestClient.mutateWith(SecurityMockServerConfigurers.csrf()).get().uri("http://localhost:8888/api/v1/artifacts/user/"+userId)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(ArtifactResponse.class).isEqualTo(List.of(response1, response2));
 
-        Mockito.verify(artifactsService).getAllArtifacts();
+        Mockito.verify(artifactsService).getAllArtifacts(userId);
     }
 
     @Test
@@ -99,14 +102,16 @@ class FilesControllerTest {
 
         ArtifactLoadResponse response = new ArtifactLoadResponse(id, new ArtifactMateInfo(name, body.length), body);
 
-        Mockito.when(artifactsService.getArtifactById(id)).thenReturn(Mono.just(response));
+        UUID userId = UUID.randomUUID();
 
-        webTestClient.mutateWith(SecurityMockServerConfigurers.csrf()).get().uri("http://localhost:8888/api/v1/artifacts/loadArtifact/" + id)
+        Mockito.when(artifactsService.getArtifactById(id,userId)).thenReturn(Mono.just(response));
+
+        webTestClient.mutateWith(SecurityMockServerConfigurers.csrf()).get().uri("http://localhost:8888/api/v1/artifacts/user/" + userId + "/" + id)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(ArtifactLoadResponse.class).isEqualTo(response);
 
-        Mockito.verify(artifactsService).getArtifactById(id);
+        Mockito.verify(artifactsService).getArtifactById(id,userId);
     }
 
     @Test
@@ -118,13 +123,15 @@ class FilesControllerTest {
 
         ArtifactResponse response = new ArtifactResponse(id, new ArtifactMateInfo(name, body.length));
 
-        Mockito.when(artifactsService.deleteArtifact(id)).thenReturn(Mono.just(response));
+        UUID userId = UUID.randomUUID();
 
-        webTestClient.mutateWith(SecurityMockServerConfigurers.csrf()).delete().uri("http://localhost:8888/api/v1/artifacts/deleteArtifact/" + id)
+        Mockito.when(artifactsService.deleteArtifact(id,userId)).thenReturn(Mono.just(response));
+
+        webTestClient.mutateWith(SecurityMockServerConfigurers.csrf()).delete().uri("http://localhost:8888/api/v1/artifacts/user/" + userId + "/"+ id)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(ArtifactResponse.class).isEqualTo(response);
 
-        Mockito.verify(artifactsService).deleteArtifact(id);
+        Mockito.verify(artifactsService).deleteArtifact(id,userId);
     }
 }

@@ -14,9 +14,11 @@ import org.student.controllers.MetaInfoController;
 import org.student.controllers.MetaInfoExceptionHandler;
 import org.student.dto.ExternalMetaInfoDto;
 import org.student.dto.InternalMetaInfoDto;
-import org.student.messaging.models.ArtifactMetadataUploadRequest;
+import org.student.messaging.models.ArtifactMetadataGetRequest;
+import org.student.messaging.models.UserArtifactMetadataUploadRequest;
 import org.student.services.MetaInfoServiceImpl;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -41,16 +43,17 @@ public class MetaInfoControllerTest {
 
     @Test
     void saveTest() throws Exception {
-        ArtifactMetadataUploadRequest request =
-                new ArtifactMetadataUploadRequest(UUID.randomUUID(),"artefact-name",12345L);
+
+        UserArtifactMetadataUploadRequest request =
+                new UserArtifactMetadataUploadRequest("artifact-name",UUID.randomUUID(),12345L,UUID.randomUUID());
 
         UUID returnedId = UUID.randomUUID();
-        when(metaInfoService.saveMetaInfo(any(ArtifactMetadataUploadRequest.class))).thenReturn(returnedId);
+        when(metaInfoService.saveMetaInfo(any(UserArtifactMetadataUploadRequest.class))).thenReturn(returnedId);
 
         String requestJson = objectMapper.writeValueAsString(request);
 
         mockMvc.perform(
-                post("/meta-info/save")
+                post("/meta-info/save-artifact")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isOk())
@@ -60,23 +63,33 @@ public class MetaInfoControllerTest {
     @ParameterizedTest
     @ValueSource(booleans = {true,false})
     void deleteTest(boolean expectedResult) throws Exception {
-        when(metaInfoService.deleteMetaInfo(any(UUID.class))).thenReturn(expectedResult);
+        ArtifactMetadataGetRequest request =
+                new ArtifactMetadataGetRequest(UUID.randomUUID(),UUID.randomUUID());
+
+        when(metaInfoService.deleteMetaInfo(any(ArtifactMetadataGetRequest.class))).thenReturn(expectedResult);
 
         mockMvc.perform(
-                delete("/meta-info/delete/"+UUID.randomUUID()))
+                delete("/meta-info/del-artifact")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request.toString()))
                 .andExpect(content().string(String.valueOf(expectedResult)));
     }
 
     @Test
     void getInternalInfoTest() throws Exception {
         var returnedInfo = new InternalMetaInfoDto(UUID.randomUUID(),"artefact-name",12345L);
-        when(metaInfoService.readInternalMetaInfoDto(any(UUID.class)))
+        when(metaInfoService.readInternalMetaInfoDto(any(ArtifactMetadataGetRequest.class)))
                 .thenReturn(Optional.of(returnedInfo));
 
         String expectedJson = objectMapper.writeValueAsString(returnedInfo);
 
+        ArtifactMetadataGetRequest request =
+                new ArtifactMetadataGetRequest(UUID.randomUUID(),UUID.randomUUID());
+
         mockMvc.perform(
-                get("/meta-info/get-internal/"+UUID.randomUUID()))
+                post("/meta-info/get-int-artifact")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedJson));
@@ -84,24 +97,31 @@ public class MetaInfoControllerTest {
 
     @Test
     void getNonExistInternalInfoTest() throws Exception {
-        when(metaInfoService.readInternalMetaInfoDto(any(UUID.class)))
+        when(metaInfoService.readInternalMetaInfoDto(any(ArtifactMetadataGetRequest.class)))
                 .thenReturn(Optional.empty());
 
         mockMvc.perform(
-                        get("/meta-info/get-internal/"+UUID.randomUUID()))
+                        post("/meta-info/get-int-artifact")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(new ArtifactMetadataGetRequest(UUID.randomUUID(),UUID.randomUUID()))))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void getExternalInfoTest() throws Exception {
         var returnedInfo = new ExternalMetaInfoDto(UUID.randomUUID(),"artefact-name",12345L);
-        when(metaInfoService.readExternalMetaInfo(any(UUID.class)))
+        when(metaInfoService.readExternalMetaInfo(any(ArtifactMetadataGetRequest.class)))
                 .thenReturn(Optional.of(returnedInfo));
 
         String expectedJson = objectMapper.writeValueAsString(returnedInfo);
 
+        ArtifactMetadataGetRequest request =
+                new ArtifactMetadataGetRequest(UUID.randomUUID(),UUID.randomUUID());
+
         mockMvc.perform(
-                        get("/meta-info/get-external/"+UUID.randomUUID()))
+                        post("/meta-info/get-ext-artifact")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedJson));
@@ -109,11 +129,30 @@ public class MetaInfoControllerTest {
 
     @Test
     void getNonExistExternalInfoTest() throws Exception {
-        when(metaInfoService.readExternalMetaInfo(any(UUID.class)))
+        when(metaInfoService.readExternalMetaInfo(any(ArtifactMetadataGetRequest.class)))
                 .thenReturn(Optional.empty());
 
         mockMvc.perform(
-                        get("/meta-info/get-external/"+UUID.randomUUID()))
+                        post("/meta-info/get-ext-artifact")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(new ArtifactMetadataGetRequest(UUID.randomUUID(),UUID.randomUUID()))))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getAllUserArtifactsTest() throws Exception {
+        List<ExternalMetaInfoDto> returnedInfo = List.of(
+                new ExternalMetaInfoDto(UUID.randomUUID(),"artefact-name",12345L));
+
+        when(metaInfoService.getAll(any(UUID.class)))
+                .thenReturn(returnedInfo);
+
+        String expectedJson = objectMapper.writeValueAsString(returnedInfo);
+
+        mockMvc.perform(
+                        get("/meta-info/getAll/"+UUID.randomUUID()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedJson));
     }
 }

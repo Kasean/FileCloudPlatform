@@ -7,7 +7,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.student.dto.ExternalMetaInfoDto;
 import org.student.dto.InternalMetaInfoDto;
-import org.student.messaging.models.ArtifactMetadataUploadRequest;
+import org.student.messaging.models.ArtifactMetadataGetRequest;
+import org.student.messaging.models.UserArtifactMetadataUploadRequest;
 import org.student.repositories.MetaInfoStorage;
 import org.student.services.MetaInfoServiceImpl;
 
@@ -31,10 +32,10 @@ class MetaInfoServiceTest {
 
     @Test
     void saveMetaInfoTest() {
-        ArtifactMetadataUploadRequest request =
-                new ArtifactMetadataUploadRequest(UUID.randomUUID(), "Artefact Name", 12345L);
+        var request =
+                new UserArtifactMetadataUploadRequest("artifactName",UUID.randomUUID(),12345L,UUID.randomUUID());
 
-        when(storage.save(any(InternalMetaInfoDto.class))).thenReturn(UUID.randomUUID());
+        when(storage.save(any(UUID.class),any(InternalMetaInfoDto.class))).thenReturn(UUID.randomUUID());
 
         UUID result = metaInfoService.saveMetaInfo(request);
 
@@ -48,9 +49,11 @@ class MetaInfoServiceTest {
         ExternalMetaInfoDto mockDto = new ExternalMetaInfoDto(
                 externalId, "Artefact Name", 12345L);
 
-        when(storage.getExternalMetaInfo(externalId)).thenReturn(Optional.of(mockDto));
+        when(storage.getExternalMetaInfo(any(UUID.class),any(UUID.class))).thenReturn(Optional.of(mockDto));
 
-        Optional<ExternalMetaInfoDto> result = metaInfoService.readExternalMetaInfo(externalId);
+        var request = new ArtifactMetadataGetRequest(UUID.randomUUID(),externalId);
+
+        Optional<ExternalMetaInfoDto> result = metaInfoService.readExternalMetaInfo(request);
 
         assertTrue(result.isPresent());
         assertEquals(mockDto, result.get());
@@ -60,9 +63,10 @@ class MetaInfoServiceTest {
     void readExternalMetaInfoNotFoundTest() {
         UUID externalId = UUID.randomUUID();
 
-        when(storage.getExternalMetaInfo(externalId)).thenReturn(Optional.empty());
+        when(storage.getExternalMetaInfo(any(UUID.class),any(UUID.class))).thenReturn(Optional.empty());
 
-        Optional<ExternalMetaInfoDto> result = metaInfoService.readExternalMetaInfo(externalId);
+        var request = new ArtifactMetadataGetRequest(UUID.randomUUID(),externalId);
+        Optional<ExternalMetaInfoDto> result = metaInfoService.readExternalMetaInfo(request);
 
         assertFalse(result.isPresent());
     }
@@ -73,9 +77,10 @@ class MetaInfoServiceTest {
         InternalMetaInfoDto mockDto = new InternalMetaInfoDto(
                 UUID.randomUUID(), "Artefact Name", 12345L);
 
-        when(storage.getInternalMetaInfoDto(externalId)).thenReturn(Optional.of(mockDto));
+        when(storage.getInternalMetaInfoDto(any(UUID.class),any(UUID.class))).thenReturn(Optional.of(mockDto));
 
-        Optional<InternalMetaInfoDto> result = metaInfoService.readInternalMetaInfoDto(externalId);
+        var request = new ArtifactMetadataGetRequest(UUID.randomUUID(),externalId);
+        Optional<InternalMetaInfoDto> result = metaInfoService.readInternalMetaInfoDto(request);
 
         assertTrue(result.isPresent());
         assertEquals(mockDto.internalId(), result.get().internalId());
@@ -85,9 +90,10 @@ class MetaInfoServiceTest {
     void readInternalMetaInfoDtoNotFoundTest() {
         UUID externalId = UUID.randomUUID();
 
-        when(storage.getInternalMetaInfoDto(externalId)).thenReturn(Optional.empty());
+        when(storage.getInternalMetaInfoDto(any(UUID.class),any(UUID.class))).thenReturn(Optional.empty());
 
-        Optional<InternalMetaInfoDto> result = metaInfoService.readInternalMetaInfoDto(externalId);
+        var request = new ArtifactMetadataGetRequest(UUID.randomUUID(),externalId);
+        Optional<InternalMetaInfoDto> result = metaInfoService.readInternalMetaInfoDto(request);
 
         assertFalse(result.isPresent());
     }
@@ -95,10 +101,10 @@ class MetaInfoServiceTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void deleteMetaInfoTest(boolean expectedResult) {
-        UUID key = UUID.randomUUID();
-        when(storage.deleteByKey(key)).thenReturn(expectedResult);
+        when(storage.deleteByKey(any(UUID.class),any(UUID.class))).thenReturn(expectedResult);
 
-        boolean result = metaInfoService.deleteMetaInfo(key);
+        var request = new ArtifactMetadataGetRequest(UUID.randomUUID(),UUID.randomUUID());
+        boolean result = metaInfoService.deleteMetaInfo(request);
 
         assertEquals(expectedResult, result);
     }
